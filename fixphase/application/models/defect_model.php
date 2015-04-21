@@ -1,6 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-class Defects extends CI_Model{
+class defect_model extends CI_Model{
      public function retrieveAll($id){ //RETRIEVE ALL DEFECTS FOR THE GIVEN PROJECT $id
           $this->db->where('related_project_id', $id);
           return $this->db->get('defect')->result();

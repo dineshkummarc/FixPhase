@@ -3,8 +3,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Defect extends CI_Controller{
      public function index($id){
-          $this->load->model('Defects');
-          $Defect = $this->Defects->retrieve($id); //Retrieve this defect
+          $this->load->model('defect_model');
+          $Defect = $this->defect_model->retrieve($id); //Retrieve this defect
           $this->load->view("Defect_view", array("data" => $Defect)); //Show the defect in HTML format
      }
      public function view($id, $mode = "none"){ //GET THIS DEFECT IN JSON FORMAT
@@ -13,12 +13,12 @@ class Defect extends CI_Controller{
                return;
           }
 
-          $this->load->model("Defects");
-          echo json_encode($this->Defects->retrieve($id)); //Spit out the defect in JSON format
+          $this->load->model("defect_model");
+          echo json_encode($this->defect_model->retrieve($id)); //Spit out the defect in JSON format
      }
      public function viewall($id){ //GET ALL THE DEFECTS FOR A GIVEN PROJECT ID
-          $this->load->model('Defects');
-          $Defects = $this->Defects->retrieveAll($id); //Get all defects for project of id = $id
+          $this->load->model('defect_model');
+          $Defects = $this->defect_model->retrieveAll($id); //Get all defects for project of id = $id
           $JSON_Defects = array();
           if(empty($Defects)){ //No projects found, Raise an error
                $JSON = array(
@@ -55,7 +55,7 @@ class Defect extends CI_Controller{
           if(!$this->input->post("title"))
                $this->load->view("Defect_submit"); //Form is not submitted, Show him the view
           else{ //Form submitted, Validate it
-               $this->load->model("Defects");
+               $this->load->model("defect_model");
                $this->form_validation->set_rules('title','Headline','required|min_length[8]|max_length[128]|xss_clean');
                $this->form_validation->set_rules('severity','Severity','required|max_length[16]|xss_clean');
                $this->form_validation->set_rules('priority','Priority','required|max_length[16]|xss_clean');
