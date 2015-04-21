@@ -23,3 +23,7 @@ class Home extends CI_Controller {
 		$this->load->view('home_view');
 	}
 }
+
+//Ali Magdy Moneib :)
+//Bassem Tarek Ahmed Mohamed \o/
+// Moataz Farid
