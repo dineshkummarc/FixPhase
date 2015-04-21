@@ -9,4 +9,7 @@ class Defects extends CI_Model{
           $this->db->where('defect_id', $id);
           return $this->db->get('defect')->result();
      }
+     public function insert($data){
+          $this->db->insert('defect', $data);
+     }
 }
