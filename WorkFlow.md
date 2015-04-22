@@ -28,7 +28,7 @@ First thing you need to do is fork the main repo on github, which means create a
 7. Now we need to make this local/master branch pull from main/master and push to forked/master, type the follwoing replacing url in the second command with the url you used in `git clone`.  
 ```
 git remote set-url origin https://github.com/AbdulazizAlaa/FixPhase.git
-git remote set-url --push url
+git remote set-url --push origin url
 ```
 
 Now you have created your local repo that is attached to both the main repo and the forked one. 
