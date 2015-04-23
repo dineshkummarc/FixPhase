@@ -24,6 +24,7 @@ class Login extends CI_Controller{
     if($this->session->userdata('id')){
           header("Location: ".base_url()."Home");
     }
+    $this->load->view("Login_view");  // Make it load the default login form in case he isn't logged in
   }
   public function validate(){
     // password validation
@@ -38,7 +39,7 @@ class Login extends CI_Controller{
     $this->load->model('user_model');
 
     //data to send to view
-    $isUser_Email_Correct = "neither email nor username is correct ";
+    $isUser_Email_Correct = "neither email nor username is correct ";      //You keep assigning values to this variable but you never check it, What's it for?
     $user = null;
     $email = null;
     $isLogged = null;
@@ -88,7 +89,7 @@ class Login extends CI_Controller{
       $this->index("Wrong user/pass");
     }
     else{
-      $this->session->set_userdata('validate',true);
+      $this->session->set_userdata('validate',true);   //What is this variable used for?
       $this->load->view('home_view');
     }
 

@@ -56,13 +56,13 @@ class Defect extends CI_Controller{
                $this->load->view("Defect_submit"); //Form is not submitted, Show him the view
           else{ //Form submitted, Validate it
                $this->load->model("defect_model");
-               $this->form_validation->set_rules('title','Headline','required|min_length[8]|max_length[128]');
-               $this->form_validation->set_rules('severity','Severity','required|max_length[16]');
-               $this->form_validation->set_rules('priority','Priority','required|max_length[16]');
-               $this->form_validation->set_rules('product','Product','required|max_length[16]|is_numeric');
-               $this->form_validation->set_rules('description','Description','required|max_length[1024]|min_length[32]');
-               $this->form_validation->set_rules('platform', 'Platform', 'required|max_length[32]|min_length[2]');
-               $this->form_validation->set_rules('version', 'Version', 'required|max_length[32]|min_length[2]');
+               $this->form_validation->set_rules('title','Headline','required|min_length[8]|max_length[128]|xss_clean');
+               $this->form_validation->set_rules('severity','Severity','required|max_length[16]|xss_clean');
+               $this->form_validation->set_rules('priority','Priority','required|max_length[16]|xss_clean');
+               $this->form_validation->set_rules('product','Product','required|max_length[16]|is_numeric|xss_clean');
+               $this->form_validation->set_rules('description','Description','required|max_length[1024]|min_length[32]|xss_clean');
+               $this->form_validation->set_rules('platform', 'Platform', 'required|max_length[32]|min_length[2]|xss_clean');
+               $this->form_validation->set_rules('version', 'Version', 'required|max_length[32]|min_length[2]|xss_clean');
                if($this->form_validation->run() !== false){ //Form is valid, Can process to the DB
                     $data = array(
                          'title' => $this->input->post("title"),
@@ -74,7 +74,7 @@ class Defect extends CI_Controller{
                          'status' => 'Open',
                          'date_raised' => date("Y-m-d"),
                          'platform' => $this->input->post('platform'),
-                         'identified_by' => $this->session->userdata('session_id');
+                         'identified_by' => $this->session->userdata('session_id')
                           );
 
                      $this->Defects->insert($data);
