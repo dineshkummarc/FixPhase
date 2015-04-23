@@ -24,12 +24,14 @@ class Login extends CI_Controller{
     if($this->session->userdata('id')){
           header("Location: ".base_url()."Home");
     }
+     // Make it load the default login form in case he isn't logged in
   }
   public function validate(){
     // password validation
-    $this->form_validation->set_rules('password', 'Password', 'required|xss_clean|min_length[8]|max_length[32]');
+    $this->form_validation->set_rules('password', 'Password', 'required|min_length[4]|max_length[32]');
 
     // grab user input
+    $this->load->library("encrypt");
     $user_email = $this->security->xss_clean($this->input->post('user_email'));
 
     $password = $this->security->xss_clean($this->input->post('password'));
@@ -38,12 +40,11 @@ class Login extends CI_Controller{
     $this->load->model('user_model');
 
     //data to send to view
-    $isUser_Email_Correct = "neither email nor username is correct ";
+    $isUser_Email_Correct = "neither email nor username is correct ";      //You keep assigning values to this variable but you never check it, What's it for?
     $user = null;
     $email = null;
     $isLogged = null;
 
-    //
     if ($this->form_validation->run() == FALSE)
     {
       //var_dump($user_email); // used for test
@@ -54,14 +55,12 @@ class Login extends CI_Controller{
       if($this->user_model->isemail($user_email)){
         // Validation For Email Field
         $this->form_validation->set_rules('user_email', 'Email', 'required|xss_clean|valid_email');
-
         $isUser_Email_Correct = true;
         $email = $user_email;
 
       }else if($this->user_model->isusername($user_email)){
         // Validation For Name Field
         $this->form_validation->set_rules('user_email', 'Username', 'required|xss_clean|min_length[4]|max_length[32]');
-
         $isUser_Email_Correct = true;
         $user = $user_email;
       }else{
@@ -73,7 +72,7 @@ class Login extends CI_Controller{
     $data['isValidForm']=$isValidForm;
     $data['isUser_Email_Correct']=$isUser_Email_Correct;
 
-    if($this->user_model->Logged($user,$email,$password)){
+    if($this->user_model->Logged($user,$email,$password)){  //It kept failing here for me, The $this->enrcypy->encode($password) in the model returns a new password everytime it's called(Encryption algorithm produces different results), Please check it or tell me what's wrong
       $data['isLogged']=$isLogged;
       $isLogged= true;
       $this->session->set_userdata('isLogged','true');
@@ -88,7 +87,7 @@ class Login extends CI_Controller{
       $this->index("Wrong user/pass");
     }
     else{
-      $this->session->set_userdata('validate',true);
+      $this->session->set_userdata('validate',true);   //What is this variable used for?
       $this->load->view('home_view');
     }
 
