@@ -26,10 +26,18 @@ First thing you need to do is fork the main repo on github, which means create a
 6. Type in terminal `git clone url` replace url with the one from the forked repo as shown below, this will create a local copy in the current directory
    ![selection_018](https://cloud.githubusercontent.com/assets/5361308/7254489/1c80c4a6-e84c-11e4-8e06-229313a51a8d.png) 
 7. Now we need to make this local/master branch pull from main/master and push to forked/master, type the follwoing replacing url in the second command with the url you used in `git clone`.  
-```
+
+    ```
 git remote set-url origin https://github.com/AbdulazizAlaa/FixPhase.git
 git remote set-url --push origin url
 ```
+8. Now we need to make database.php changes not tracked by git so use this, make sure you are in the root directory that contains the fixphase folder
+
+    ````
+    git checkout master
+    git update-index --assume-unchanged fixphase/application/config/database.php
+    ````
+
 
 Now you have created your local repo that is attached to both the main repo and the forked one. 
 
