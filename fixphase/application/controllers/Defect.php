@@ -8,13 +8,17 @@ class Defect extends CI_Controller{
           $this->load->view("Defect_view", array("data" => $Defect)); //Show the defect in HTML format
      }
      public function view($id, $mode = "none"){ //GET THIS DEFECT IN JSON FORMAT
-          if($mode != "json"){ //Is it a request to the API or a normal user?
+          if($mode == "none"){ //Is it a request to the API or a normal user?
                $this->index($id);
                return;
           }
-
-          $this->load->model("defect_model");
-          echo json_encode($this->defect_model->retrieve($id)); //Spit out the defect in JSON format
+          else if($mode == "all"){
+               $this->viewall($id);
+          }
+          else{
+               $this->load->model("defect_model");
+               echo json_encode($this->defect_model->retrieve($id)); //Spit out the defect in JSON format
+          }
      }
      public function viewall($id){ //GET ALL THE DEFECTS FOR A GIVEN PROJECT ID
           $this->load->model('defect_model');
