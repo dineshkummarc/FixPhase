@@ -47,6 +47,7 @@ class user_model extends CI_Model{
      * This Function used to check is email exists in db
      * @param $email
      * @return bool
+         * Author : Moataz M. Farid
      */
     public function isemail($email){
         $email = strtolower ($email);
@@ -62,6 +63,7 @@ class user_model extends CI_Model{
      * This Function used to check is username exists in db
      * @param $user
      * @return bool
+     * Author : Moataz M. Farid
      */
     public function isusername($user){
         $user = strtolower ($user);
@@ -81,13 +83,14 @@ class user_model extends CI_Model{
      * @param $email
      * @param $password
      * @return bool
+     * Author : Moataz M. Farid
      */
-    public function logged($user,$email,$password){
+    public function logging($user,$email,$password){
         $user = strtolower ($user);
         $email = strtolower ($email);
     //        var_dump($user); // testing
     //        var_dump($email); // testing
-        $password = $this->encrypt->encode($password);
+
         if($this->isemail($email)&&isset($password)){
             $sql='Select * from `users`  where `email` = ? and `password` = ?';
             $query = $this->db->query($sql,array($email,$password));
@@ -98,7 +101,7 @@ class user_model extends CI_Model{
         }elseif($this->isusername($user)&&isset($password)){
             $sql='Select * from `users` where `username` = ? and `password` = ?';
             $query = $this->db->query($sql,array($user,$password));
-            if($query->num_rows() > 0){
+            if($query->num_rows() == 1){
                 // user exists and
                 return true;
             }
