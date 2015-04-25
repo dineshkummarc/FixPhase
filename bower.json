@@ -1,0 +1,32 @@
+{
+  "name": "fixphase",
+  "version": "0.0.1",
+  "homepage": "https://github.com/AbdulazizAlaa/FixPhase",
+  "authors": [
+    "Karim Tarabishy <tarabishy_2020@hotmai.com>"
+  ],
+  "description": "bug tracking system",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.3",
+    "requirejs-router": "~0.8.0",
+    "requirejs": "~2.1.17",
+    "requirejs-text": "~2.0.14"
+  },
+  "install": {
+    "path": "fixphase/public/assets/lib/",
+    "sources": {
+      "jquery": [
+        "bower_components/jquery/dist/*.+(map|js)"
+      ]
+    }
+  }
+}
