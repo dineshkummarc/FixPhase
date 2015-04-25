@@ -205,7 +205,7 @@ git rebase --preserve-merges origin/master
 ```
 
     Solve any conflicts appearing then push again with `git push`
-3. Manually close the pull request with a merged comment as shown below. (Optionally you can add the merge commit hash to your comment)
+3. If pull request was not automatically closed by github then manually close it with a merged comment as shown below. (Optionally you can add the merge commit hash to your comment)
 
     ![image](https://cloud.githubusercontent.com/assets/5361308/7332814/e1947ff4-eb5c-11e4-9621-6a27bcc39837.png)
 
