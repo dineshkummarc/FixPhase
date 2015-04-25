@@ -165,7 +165,7 @@ So when evenr you want to work on something do the following (replace `featurena
 
 ## Merging pull requests (for maintainers only)
 
-We should not merge pull request from github directly as this will mess up our history also we woudnlt be abel to test the code in pull request locally before merging it.
+We should not merge pull request from github directly as this will mess up our history also we woudn't be abel to test the code in pull requests locally before merging it.
 
 First lets add more shortcuts that will help us in merging so add the follwing lines to your .gitconfig file under alias: (if you want to know how to add shortcuts refer to [this](#shortcuts))
 
@@ -203,6 +203,8 @@ git checkout master
 git pull
 git rebase --preserve-merges origin/master
 ```
+
+    Solve any conflicts appearing then push again with `git push`
 3. Manually close the pull request with a merged comment as shown below. (Optionally you can add the merge commit hash to your comment)
 
     ![image](https://cloud.githubusercontent.com/assets/5361308/7332814/e1947ff4-eb5c-11e4-9621-6a27bcc39837.png)
@@ -211,7 +213,7 @@ git rebase --preserve-merges origin/master
 
 
 
-Solve any conflicts appearing then push again with `git push`
+
 
 
 
