@@ -1,2 +1,4 @@
 /.project
 /.idea
+/bower_components
+/fixphase/application/config/database.php
