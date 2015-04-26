@@ -25,6 +25,7 @@ class Login extends CI_Controller{
           header("Location: ".base_url()."Home");
     }
      // Make it load the default login form in case he isn't logged in
+     $this->load->view("Login_view");
   }
   public function validate(){
     // password validation
@@ -71,7 +72,6 @@ class Login extends CI_Controller{
     }
     $data['isValidForm']=$isValidForm;
     $data['isUser_Email_Correct']=$isUser_Email_Correct;
-
     if($this->user_model->Logged($user,$email,$password)){  //It kept failing here for me, The $this->enrcypy->encode($password) in the model returns a new password everytime it's called(Encryption algorithm produces different results), Please check it or tell me what's wrong
       $data['isLogged']=$isLogged;
       $isLogged= true;
@@ -81,7 +81,6 @@ class Login extends CI_Controller{
     }else{
       $isLogged=false;
       $data['isLogged']=$isLogged;
-
     }
     if(!$isLogged){
       $this->index("Wrong user/pass");

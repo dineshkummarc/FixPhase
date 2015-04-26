@@ -88,7 +88,6 @@ class user_model extends CI_Model{
     //        var_dump($user); // testing
     //        var_dump($email); // testing
         $password = $this->encrypt->encode($password);
-
         if($this->isemail($email)&&isset($password)){
             $sql='Select * from `users`  where `email` = ? and `password` = ?';
             $query = $this->db->query($sql,array($email,$password));
