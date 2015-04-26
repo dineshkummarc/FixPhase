@@ -2,21 +2,47 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Defect extends CI_Controller{
-     public function index($id){
-          $this->load->model('defect_model');
-          $Defect = $this->defect_model->retrieve($id); //Retrieve this defect
-          $this->load->view("Defect_view", array("data" => $Defect)); //Show the defect in HTML format
+
+     public function _remap($method, $params = array()){    //Solution for the problem arising when parameters are passed to the index func
+          if(method_exists($this, $method)){      //Does this controller have the requested method?
+               call_user_func_array(array($this, $method), $params);  //Call it
+          }
+          else{     //No it doesn't, Assume index.
+               $params[0] = isset($params[0]) ? $params[0]:"none";
+               $this->index($method, $params[0]);
+          }
      }
-     public function view($id, $mode = "none"){ //GET THIS DEFECT IN JSON FORMAT
-          if($mode != "json"){ //Is it a request to the API or a normal user?
+     public function index($id = "none", $mode = "none"){
+          if($id == "none"){
+               $this->load->view("errors/no_defect");
+          }
+          else{
+               switch($mode){
+                    case 'none':
+                         $this->load->model('defect_model');
+                         $Defect = $this->defect_model->retrieve($id); //Retrieve this defect
+                         $this->load->view("Defect_view", array("data" => $Defect)); //Show the defect in HTML format
+                         break;
+                    case 'all':
+                         $this->viewall($id);
+                         break;
+                    case 'json':
+                         $this->view($id, "json");
+                         break;
+               }
+          }
+     }
+     protected function view($id, $mode = "none"){ //GET THIS DEFECT IN JSON FORMAT
+          if($mode == "none"){ //Is it a request to the API or a normal user?
                $this->index($id);
                return;
           }
-
-          $this->load->model("defect_model");
-          echo json_encode($this->defect_model->retrieve($id)); //Spit out the defect in JSON format
+          else if($mode == "json"){
+               $this->load->model("defect_model");
+               echo json_encode($this->defect_model->retrieve($id)); //Spit out the defect in JSON format
+          }
      }
-     public function viewall($id){ //GET ALL THE DEFECTS FOR A GIVEN PROJECT ID
+     protected function viewall($id){ //GET ALL THE DEFECTS FOR A GIVEN PROJECT ID
           $this->load->model('defect_model');
           $Defects = $this->defect_model->retrieveAll($id); //Get all defects for project of id = $id
           $JSON_Defects = array();
@@ -85,5 +111,4 @@ class Defect extends CI_Controller{
                }
           }
      }
-
 }
