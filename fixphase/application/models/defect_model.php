@@ -11,5 +11,6 @@ class defect_model extends CI_Model{
      }
      public function insert($data){
           $this->db->insert('defect', $data);
+          return $this->db->insert_id();
      }
 }
