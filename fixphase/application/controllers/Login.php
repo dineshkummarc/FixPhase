@@ -20,79 +20,98 @@ class Login extends CI_Controller{
   //you have to check that the old password is true
   //if true updated to the new password
   //<===========WORK==========>
-  public function index(){
-    if($this->session->userdata('id')){
-          header("Location: ".base_url()."Home");
+
+  public function index($msg = null){
+    if($this->session->userdata('validate')==true){ // Moataz: This variable check whether you are validated or not
+          header("Location: ".base_url()."Home");// what is this for ?? asked By Moataz
+    }else{
+        // Make it load the default login form in case he isn't logged in
+        $data['msg']=$msg;
+        $this->load->view('login_view',$data);
     }
-     // Make it load the default login form in case he isn't logged in
-     $this->load->view("Login_view");
   }
+
+    /**
+     *This function is used to validate the user/pass from the login field
+     * it is called from login view
+     *
+     * Author : Moataz M. Farid
+     */
   public function validate(){
-    // password validation
-    $this->form_validation->set_rules('password', 'Password', 'required|min_length[4]|max_length[32]');
+//     load librarries , models
+        $this->load->model('user_model');
 
-    // grab user input
-    $this->load->library("encrypt");
-    $user_email = $this->security->xss_clean($this->input->post('user_email'));
 
-    $password = $this->security->xss_clean($this->input->post('password'));
+        // password validation
+        $this->form_validation->set_rules('password', 'Password', 'required|min_length[4]|max_length[32]');
 
-    // load
-    $this->load->model('user_model');
 
-    //data to send to view
-    $isUser_Email_Correct = "neither email nor username is correct ";      //You keep assigning values to this variable but you never check it, What's it for?
-    $user = null;
-    $email = null;
-    $isLogged = null;
 
-    if ($this->form_validation->run() == FALSE)
-    {
-      //var_dump($user_email); // used for test
-      // not valid
-      $isValidForm=false;
-    }else{
-      // valid form
-      if($this->user_model->isemail($user_email)){
-        // Validation For Email Field
-        $this->form_validation->set_rules('user_email', 'Email', 'required|xss_clean|valid_email');
-        $isUser_Email_Correct = true;
-        $email = $user_email;
+        // grab user input
+        $user_email = $this->security->xss_clean($this->input->post('user_email')); // get user or email from visitor
 
-      }else if($this->user_model->isusername($user_email)){
-        // Validation For Name Field
-        $this->form_validation->set_rules('user_email', 'Username', 'required|xss_clean|min_length[4]|max_length[32]');
-        $isUser_Email_Correct = true;
-        $user = $user_email;
-      }else{
-        $isUser_Email_Correct = "neither email nor username is correct ";
-      }
-      $isValidForm=true;
-      //$this->load->view('formsubmit');
-    }
-    $data['isValidForm']=$isValidForm;
-    $data['isUser_Email_Correct']=$isUser_Email_Correct;
-    if($this->user_model->Logged($user,$email,$password)){  //It kept failing here for me, The $this->enrcypy->encode($password) in the model returns a new password everytime it's called(Encryption algorithm produces different results), Please check it or tell me what's wrong
-      $data['isLogged']=$isLogged;
-      $isLogged= true;
-      $this->session->set_userdata('isLogged','true');
-      $this->session->set_userdata('username',$user);
-      $this->session->set_userdata('email',$email);
-    }else{
-      $isLogged=false;
-      $data['isLogged']=$isLogged;
-    }
-    if(!$isLogged){
-      $this->index("Wrong user/pass");
-    }
-    else{
-      $this->session->set_userdata('validate',true);   //What is this variable used for?
-      $this->load->view('home_view');
-    }
+        $password = $this->security->xss_clean($this->input->post('password')); // get password from visitor
 
+
+        //data to send to view
+        $isUser_Email_Correct = "neither email nor username is correct ";      //You keep assigning values to this variable but you never check it, What's it for?
+        $user = null;
+        $email = null;
+        $isLogged = null;
+
+//        running form validation
+        if ($this->form_validation->run() == FALSE)
+        {
+          //var_dump($user_email); // used for test
+          // then it is not valid
+          $isValidForm=false;
+        }else{
+          // then it is valid form
+
+          if($this->user_model->isemail($user_email)){ // check if the entered is an email
+            // Validation Rules For Email Field
+            $this->form_validation->set_rules('user_email', 'Email', 'required|xss_clean|valid_email');
+            $isUser_Email_Correct = true;
+            $email = $user_email; // assign input value to var $email
+
+          }else if($this->user_model->isusername($user_email)){ // check if the entered is an username
+            // Validation For Name Field
+            $this->form_validation->set_rules('user_email', 'Username', 'required|xss_clean|min_length[4]|max_length[32]');
+            $isUser_Email_Correct = true;
+            $user = $user_email; // assign input value to var $user
+          }else{
+            $isUser_Email_Correct = "neither email nor username is correct ";
+          }
+          $isValidForm=true;
+          //$this->load->view('formsubmit');
+        }
+        $data['isValidForm']=$isValidForm; // this will be used in the view to identify that the form is valid
+        $data['isUser_Email_Correct']=$isUser_Email_Correct; // this will be used in the view to identify that user_email_is_correct
+
+        if($this->user_model->logging($user,$email,$password)){
+
+            $this->session->set_userdata('validate',true);
+            $this->session->set_userdata('username',$user);
+            $this->session->set_userdata('email',$email);
+
+
+            ///// logging check complete you can redirect to whatever you want
+            $this->load->view('home_view'); // go to home view
+
+        }else{
+            $this->session->set_userdata('validate',false);
+            $this->index("Wrong user/pass");
+        }
 
   }
 
+    /**
+     *This is a basic logout function it just destroy complete session
+     * author : Moataz M Farid
+     */
+    function logout(){
+        $this->session->sess_destroy();
+    }
 
 
   //<===========WORK==========>
