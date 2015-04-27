@@ -10,4 +10,5 @@ requirejs.config({
 
 
 require(["router","config/routes"], function(router,routes){
+    router.registerRoutes(routes);
 });
