@@ -151,13 +151,14 @@ define([], function() {
             router.activeRoute = route;
 
             // Load the route's module
-            require([route.moduleId], function(module) {
+            require([route.moduleId, route.skeleton], function(module, skeleton) {
               // Make sure this is still the active route from when loadCurrentRoute was called. The asynchronous nature
               // of AMD loaders means we could have fireed multiple hashchanges or popstates before the AMD module finished
               // loading. If we navigate to route /a then navigate to route /b but /b finishes loading before /a we don't
               // want /a to be rendered since we're actually at route /b.
+
               if (route.active) {
-                router.fire('routeload', module, router.routeArguments(route, window.location.href));
+                router.fire('routeload', skeleton, module, router.routeArguments(route, window.location.href));
               }
             });
             break;
