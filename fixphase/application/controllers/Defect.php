@@ -40,9 +40,50 @@ class Defect extends Auth_Controller{
           //PUT requests
           echo "put";
      }
-     public function _remap($method, $params = array()){   //Solution for the problem arising when parameters are passed to the index func
-          if(method_exists($this, $method)){     //Does this controller have the requested method?
-               call_user_func_array(array($this, $method), $params);  //Call it
+     public function comment_get(){
+          $did = $this->get('did');
+          if($did){
+               $this->load->model('comments');
+               $result = $this->comments->retrieve_defect_comments($did);
+               if($result)
+                    $this->response($result);
+               else
+                    $this->response(array('error' => 'Comment not found'),404);
+          }
+          else
+               $this->response(array('error' => 'Comment not found'),404);
+     }
+     public function comment_post(){
+          $this->load->model('comments');
+          $data = $this->post('data');
+          $comment = array(
+               'project_id' => $data['pid'],
+               'defect_id' => $data['did'],
+               'user_id' => $data['comment']['userid'],
+               'comment' => $data['comment']['comment']
+          );
+          $this->comments->insert($data);
+     }
+     public function comment_put(){
+          $this->load->model('comments');
+          $data = $this->put('data');
+          $comment =  array(
+               'project_id' => $data['pid'],
+               'defect_id' => $data['did'],
+               'user_id' => $data['comment']['userid'],
+               'comment' => $data['comment']['comment']
+          );
+          $where = $data['cid'];
+     }
+     public function comment_delete(){
+          $this->load->model('comments');
+          $data = $this->delete('data');
+          $delete_comment = array('comment_id' => $data['cid']);
+          $this->comments->delete($delete_comment);
+     }
+     public function _remap($method, $params = array()){  //Solution for the problem arising when parameters are passed to the index func
+          if(method_exists($this, $method.'_'.strtolower($this->input->server('REQUEST_METHOD')))){    //Does this controller have the requested method?
+               call_user_func_array(array($this, $method.'_'.strtolower($this->input->server('REQUEST_METHOD'))), $params);  //Call it
           }
           else{     //No it doesn't, Assume index.
                $this->index_get($method);
