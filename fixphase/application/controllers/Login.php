@@ -27,7 +27,7 @@ class Login extends CI_Controller{
     }else{
         // Make it load the default login form in case he isn't logged in
         $data['msg']=$msg;
-        $this->load->view('Login_view',$data);
+        $this->load->view('login_view',$data);
     }
   }
 

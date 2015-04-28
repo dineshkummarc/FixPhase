@@ -5,41 +5,25 @@ require_once APPPATH.'/libraries/Auth_Controller.php';
 
 class Defect extends Auth_Controller{
 
-     //this function should work instead of the regular index() function
-     //but it is not working this maybe due to the changes you did in routing
-     public function index_get($did, $mode){ echo $did,$mode;
-          $pid = "none";
-          if($mode == "all")
-               $pid = $did;
-          if($did == "index" && $this->get('did')){
-               $did = $this->get('did');
-               $mode = "json";
-          }
-          if($this->get('pid'))
-               $pid = $this->get('pid');
-          if($mode == "none" && $did == "index" && $this->get('pid'))
-               $mode = "all";
-          if(!is_numeric($did) && !is_numeric($pid)){
+     public function __construct(){
+          parent::__construct();
+          $this->response->format = 'json';
+     }
+     public function index_get($did){
+          if($did == 'index' && !$this->get('pid'))
                $this->load->view("errors/no_defect");
+          else if(is_numeric($did)){
+               $this->load->model("defect_model");
+               $result = $this->defect_model->retrieve($did);
+               if($result == false)
+                    $this->load->view("errors/no_defect");
+               else
+                    $this->load->view("defect_view", $result);
           }
-          else{
-               switch($mode){
-                    case 'none':
-                         $this->load->model('defect_model');
-                         $Defect = $this->defect_model->retrieve($did); //Retrieve this defect
-                         if($Defect === false)
-                              $this->load->view('errors/no_defect');
-                         else
-                              $this->load->view("Defect_view", array("data" => $Defect)); //Show the defect in HTML format
-                         break;
-                    case 'all':
-                         $this->viewall($pid);
-                         break;
-                    case 'json':
-                         $this->view($did, "json");
-                         break;
-               }
-          }
+          else if($this->get('pid') && $this->get('did'))
+               $this->view($this->get('did'));
+          else if($this->get('pid') && !$this->get('did'))
+               $this->viewall($this->get('pid'));
      }
 
      public function index_post(){
@@ -56,28 +40,29 @@ class Defect extends Auth_Controller{
           //PUT requests
           echo "put";
      }
-
      public function _remap($method, $params = array()){   //Solution for the problem arising when parameters are passed to the index func
           if(method_exists($this, $method)){     //Does this controller have the requested method?
                call_user_func_array(array($this, $method), $params);  //Call it
           }
           else{     //No it doesn't, Assume index.
-               $params[0] = isset($params[0]) ? $params[0]:"none";
-               $this->index_get($method, $params[0]);
+               $this->index_get($method);
           }
      }
-     protected function view($id, $mode){ //GET THIS DEFECT IN JSON FORMAT
-          if($mode == "json"){
+     protected function view($id){ //RESPOND WITH THIS DEFECT
                $this->load->model("defect_model");
-               echo json_encode($this->defect_model->retrieve($id)); //Spit out the defect in JSON format
-          }
+               $result = $this->defect_model->retrieve($id);
+               if($result == false)
+                    $this->response(array('error' => 'Defect not found'), 404);
+               else
+                    $this->response($result);
      }
      protected function viewall($id){ //GET ALL THE DEFECTS FOR A GIVEN PROJECT ID
           $this->load->model('defect_model');
           $Defects = $this->defect_model->retrieveAll($id); //Get all defects for project of id = $id
-          $JSON_Defects = array();
-          if(empty($Defects)){ //No projects found, Raise an error
-               $JSON = array(
+          $Prj_Defects = array();
+          $project;
+          if(!$Defects){ //No defects found, Raise an error
+               $project = array(
                     'session_id' => $this->session->userdata('session_id'),
                     'data' => null,
                     'error' => array(
@@ -88,7 +73,7 @@ class Defect extends Auth_Controller{
           }
           else {
                foreach($Defects as $defect){ //All is well, Customize what should be sent through JSON
-                    $JSON_Defects[] = array(
+                    $Prj_Defects[] = array(
                          "id" => $defect->defect_id,
                          "name" => $defect->title,
                          "status" => $defect->status,
@@ -96,16 +81,16 @@ class Defect extends Auth_Controller{
                          "severity" => $defect->severity
                     );
                }
-                    $JSON = array(
+                    $project = array(
                     'session_id' => $this->session->userdata('session_id'),
-                    'data' => $JSON_Defects,
+                    'data' => $Prj_Defects,
                     'error' => array(
                          'status' => false,
                          'message' => ""
                     )
                );
           }
-     echo json_encode($JSON);
+          $this->response($project);
      }
      public function create($project = "none"){ //Create a new defect
           $this->session->set_userdata(array("session_id" => 3));
@@ -123,7 +108,7 @@ class Defect extends Auth_Controller{
           }
           else {
                if(!$this->input->post("product"))
-                    $this->load->view("Defect_submit", array("project_id" => $project)); //Form is not submitted, Show him the view
+                    $this->load->view("defect_submit", array("project_id" => $project)); //Form is not submitted, Show him the view
                else{ //Form submitted, Validate it
                     $this->load->model("defect_model");
                     $this->form_validation->set_rules('title','Headline','required|trim|min_length[8]|max_length[128]');
@@ -153,7 +138,7 @@ class Defect extends Auth_Controller{
                           header("Location: ".base_url()."Project/view/".$this->input->post("product"));
                     }
                     else{ //User is dumb, Show him some errors.
-                         $this->load->view("Defect_submit", array("project_id" => $project, "errors" => $this->upload->display_errors()));
+                         $this->load->view("defect_submit", array("project_id" => $project, "errors" => $this->upload->display_errors()));
                     }
                }
           }
