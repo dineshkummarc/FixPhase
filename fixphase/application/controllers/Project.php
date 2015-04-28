@@ -1,15 +1,20 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+require_once APPPATH.'/libraries/Auth_Controller.php';
 
-class Project extends CI_Controller{
+class Project extends Auth_Controller{
 
-  
+  public function index(){
+    echo "index";
+  }
 
-  public function view($type){
+  public function index_get(){
+    //GET requests
+    echo "get";
     //use this to insure that the request is coming from an ajax call not from a browser
-    if($this->input->is_ajax_request()){
-      if($type === "all"){
+    //if($this->input->is_ajax_request()){
+      if($this->get('pid') == null){
         //request to get all the projects in the database
         //will return ids and names only
         $this->load->model('project_model');
@@ -41,7 +46,7 @@ class Project extends CI_Controller{
         $json = new stdClass();
         $json->session_id = $this->session->userdata('session_id');
         $json->data = new stdClass();
-        $json->data->project = $this->project_model->get_project(intval($type))[0];
+        $json->data->project = $this->project_model->get_project($this->get('pid'));
         $json->error = new stdClass();
         $json->error->status = "false";
         $json->error->message = "";
@@ -57,6 +62,22 @@ class Project extends CI_Controller{
         }
         */
       }
-    }
+    //}
   }
+
+  public function index_post(){
+    //POST requests
+    echo "post";
+  }
+
+  public function index_delete(){
+    //DELETE requests
+    echo "delete";
+  }
+
+  public function index_put(){
+    //PUT requests
+    echo "put";
+  }
+
 }

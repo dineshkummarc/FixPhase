@@ -71,6 +71,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 	<h1>Welcome to Home!</h1>
 
 	<div id="body">
+		<a href= <?php echo base_url()."Login/logout"; ?> >Logout</a>
 		<p>The Home page you are looking at is being generated dynamically by CodeIgniter.</p>
 	</div>
 

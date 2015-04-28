@@ -1,7 +1,31 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Defect extends CI_Controller{
+require_once APPPATH.'/libraries/Auth_Controller.php';
+
+class Defect extends Auth_Controller{
+
+     //this function should work instead of the regular index() function
+     //but it is not working this maybe due to the changes you did in routing
+     public function index_get(){
+          //GET requests
+          echo "get";
+     }
+
+     public function index_post(){
+          //POST requests
+          echo "post";
+     }
+
+     public function index_delete(){
+          //DELETE requests
+          echo "delete";
+     }
+
+     public function index_put(){
+          //PUT requests
+          echo "put";
+     }
 
      public function _remap($method, $params = array()){    //Solution for the problem arising when parameters are passed to the index func
           if(method_exists($this, $method)){      //Does this controller have the requested method?

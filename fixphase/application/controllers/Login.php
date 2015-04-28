@@ -22,7 +22,7 @@ class Login extends CI_Controller{
   //<===========WORK==========>
 
   public function index($msg = null){
-    if($this->session->userdata('validate')==true){ // Moataz: This variable check whether you are validated or not
+    if($this->session->userdata('logged_in')){ // Moataz: This variable check whether you are validated or not
           header("Location: ".base_url()."Home");// what is this for ?? asked By Moataz
     }else{
         // Make it load the default login form in case he isn't logged in
@@ -90,16 +90,16 @@ class Login extends CI_Controller{
 
         if($this->user_model->logging($user,$email,$password)){
 
-            $this->session->set_userdata('validate',true);
+            $this->session->set_userdata('logged_in',true);
             $this->session->set_userdata('username',$user);
             $this->session->set_userdata('email',$email);
 
 
             ///// logging check complete you can redirect to whatever you want
-            $this->load->view('home_view'); // go to home view
+            redirect('Home');// go to home view
 
         }else{
-            $this->session->set_userdata('validate',false);
+            $this->session->set_userdata('logged_in',false);
             $this->index("Wrong user/pass");
         }
 
@@ -111,6 +111,7 @@ class Login extends CI_Controller{
      */
     function logout(){
         $this->session->sess_destroy();
+        redirect('login');
     }
 
 
