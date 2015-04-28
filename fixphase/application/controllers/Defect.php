@@ -7,22 +7,36 @@ class Defect extends Auth_Controller{
 
      //this function should work instead of the regular index() function
      //but it is not working this maybe due to the changes you did in routing
-     public function index_get($id = "none", $mode = "none"){
-               if($id == "none"){
+     public function index_get($did, $mode){ echo $did,$mode;
+          $pid = "none";
+          if($mode == "all")
+               $pid = $did;
+          if($did == "index" && $this->get('did')){
+               $did = $this->get('did');
+               $mode = "json";
+          }
+          if($this->get('pid'))
+               $pid = $this->get('pid');
+          if($mode == "none" && $did == "index" && $this->get('pid'))
+               $mode = "all";
+          if(!is_numeric($did) && !is_numeric($pid)){
                $this->load->view("errors/no_defect");
           }
           else{
                switch($mode){
                     case 'none':
                          $this->load->model('defect_model');
-                         $Defect = $this->defect_model->retrieve($id); //Retrieve this defect
-                         $this->load->view("Defect_view", array("data" => $Defect)); //Show the defect in HTML format
+                         $Defect = $this->defect_model->retrieve($did); //Retrieve this defect
+                         if($Defect === false)
+                              $this->load->view('errors/no_defect');
+                         else
+                              $this->load->view("Defect_view", array("data" => $Defect)); //Show the defect in HTML format
                          break;
                     case 'all':
-                         $this->viewall($id);
+                         $this->viewall($pid);
                          break;
                     case 'json':
-                         $this->view($id, "json");
+                         $this->view($did, "json");
                          break;
                }
           }
@@ -43,8 +57,8 @@ class Defect extends Auth_Controller{
           echo "put";
      }
 
-     public function _remap($method, $params = array()){    //Solution for the problem arising when parameters are passed to the index func
-          if(method_exists($this, $method)){      //Does this controller have the requested method?
+     public function _remap($method, $params = array()){   //Solution for the problem arising when parameters are passed to the index func
+          if(method_exists($this, $method)){     //Does this controller have the requested method?
                call_user_func_array(array($this, $method), $params);  //Call it
           }
           else{     //No it doesn't, Assume index.
@@ -52,28 +66,7 @@ class Defect extends Auth_Controller{
                $this->index_get($method, $params[0]);
           }
      }
-     public function index($id = "none", $mode = "none"){
-          $this->index_get($id, $mode);
-#          if($id == "none"){
-#               $this->load->view("errors/no_defect");
-#          }
-#          else{
-#               switch($mode){
-#                    case 'none':
-#                         $this->load->model('defect_model');
-#                         $Defect = $this->defect_model->retrieve($id); //Retrieve this defect
-#                         $this->load->view("Defect_view", array("data" => $Defect)); //Show the defect in HTML format
-#                         break;
-#                    case 'all':
-#                         $this->viewall($id);
-#                         break;
-#                    case 'json':
-#                         $this->view($id, "json");
-#                         break;
-#               }
-#          }
-     }
-     protected function view($id, $mode = "none"){ //GET THIS DEFECT IN JSON FORMAT
+     protected function view($id, $mode){ //GET THIS DEFECT IN JSON FORMAT
           if($mode == "json"){
                $this->load->model("defect_model");
                echo json_encode($this->defect_model->retrieve($id)); //Spit out the defect in JSON format
