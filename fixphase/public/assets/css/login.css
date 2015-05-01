@@ -1,0 +1,59 @@
+@charset "utf-8";
+/* CSS Document */
+
+.container{
+	background-color:#5187a0;
+	height:667px;
+	width:100%;
+	}
+	.login{
+		position:absolute;
+		
+	width:33%;
+	left:33%;
+	top:40%;
+		}
+	
+	#logo{
+		position:absolute;
+		height:100px;
+		width:320px;
+		margin-top:100px;
+		left:25%;
+		}
+		#email{
+    border-radius: 25px;
+	background-image:url(../new%20design/Untitled-1.jpg);
+	 background-repeat: no-repeat;
+    background-position:96%;
+			}
+			#pass{
+				margin-top:8%;
+				border-radius: 25px;
+	background-image:url(../new%20design/pass.jpg);
+	 background-repeat: no-repeat;
+    background-position:96%;
+			}
+		#checkbox	
+		{
+			margin-top:7%;
+			margin-left:2%;
+			color:#FFFFFF;
+			}
+			#lgoinbtn{
+				left:8%;
+				margin-top:5%;
+				}
+				.btn-default{width:85%; background-color:#f7f0d9;}
+				#signup{
+					margin-top:7%;
+			margin-left:2%;
+					}
+					#forgetpass{
+						margin-top:7%;
+						margin-left:30%;
+						}
+				a{
+					color:#000000;
+					text-decoration: underline;
+					font-size:16px;}

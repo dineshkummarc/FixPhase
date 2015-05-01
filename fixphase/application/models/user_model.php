@@ -15,30 +15,15 @@ class user_model extends CI_Model{
     //if you have more alternatives you should return a discribtive string
     //<===========WORK==========>
     //<===========Ali & Bassem=============>
-    public function insert_user()
+    public function insert_user($data)
     {
-      $fname= strtolower($this->input->post('Fname'));
-      $lname= strtolower($this->input->post('Lname'));
-      $data = array(
-        'username'=> strtolower($this->input->post('username')),
-        'password'=> strtolower($this->input->post('password')),
 
-        'email'=> strtolower($this->input->post('email')),
-        'full_name'=> $fname . " " . $lname
-      );
-
-
-      $query = $this->db->insert('users',$data);
-      if($query)
-      {
-        //use a discribtive message please :D :D
-        echo "3aab 3alaak";
-      }
-      else
-      {
-        //same here
-        echo "bdan naak";
-      }
+        $query = $this->db->insert('users',$data);
+        if($query){
+                return true;
+              }else{
+                return false;
+        }
 
     }
 
@@ -109,29 +94,4 @@ class user_model extends CI_Model{
             return false;
         }
     }
-
-#    public function insert_user()
-#    {
-#    $fname= strtolower($this->input->post('Fname'));
-#    $lname= strtolower($this->input->post('Lname'));
-#    $data = array(
-#    'username'=> strtolower($this->input->post('username')),
-#    'password'=> strtolower($this->input->post('password')),
-
-#    'email'=> strtolower($this->input->post('email')),
-#     'full_name'=> $fname . " " . $lname
-#    );
-
-
-#    $query = $this->db->insert('users',$data);
-#    if($query)
-#    {
-#     echo "3aab 3alaak";
-#    }
-#        else
-#     {
-#       echo "bdan naak";
-#     }
-
-#    }
 }

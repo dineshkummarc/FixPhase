@@ -1,0 +1,112 @@
+@charset "utf-8";
+/* CSS Document */
+
+body {
+	
+	background-color:#4f859e;
+	
+	}
+
+.register 
+
+{   
+position:absolute;
+	height:400px;
+	width:40%;
+	left:30%;
+	
+	top:20%;
+
+	
+	}
+	
+
+	
+	#fill_form {
+		margin:auto;
+		width:70%;
+	border-width:1px;
+	border-radius:30px;
+	
+	
+		}
+		
+		
+		#role{margin:auto;
+		width:70%;
+	border-width:1px;
+	border-radius:30px;}
+		
+.form-control:focus{
+	border-color:#225ba7;
+box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(0,0,100,.6)}
+
+}
+				
+			.form-control{
+				
+				
+				padding-top:5%;
+			    
+				
+		
+				}
+				
+				
+			
+			
+			.form-group{
+				
+				margin-left:8%;
+				padding-top:15px;
+				margin-left:2%;
+				
+		
+				}
+				
+				
+	.btn-warning{
+		position:absolute;
+		margin-top:3%;
+		left:30%;
+		width:40%;
+		opacity:0.8;
+		border-color:#0d1a23;
+		background-color:#0d1a23;
+		color:#fff;
+		}
+		
+		
+		.btn-warning:hover {
+			border-color:#0d1a23;
+			opacity:1;
+		background-color:#0d1a23;
+		color:#fff;
+			
+			
+			}
+		
+		.logo {
+			
+			margin-left:41%;
+			margin-top:0.5%;
+			
+			
+			
+			}
+			
+			
+			.checkbox{
+				margin-left:26%;
+				
+				color:#fff;
+				
+				
+				}
+			
+			a{
+				
+				color:#000;
+				}
+				
+				
