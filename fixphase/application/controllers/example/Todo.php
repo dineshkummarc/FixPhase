@@ -70,9 +70,8 @@ class Todo extends REST_Controller{
         {
             $this->response(array(),201);
         }
-
-
     }
+
 
 
 }
