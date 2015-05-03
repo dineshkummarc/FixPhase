@@ -1,5 +1,5 @@
 requirejs.config({
-    baseUrl: '/assets/app',
+    baseUrl: '/assets/example-app',
     paths: {
         jquery: "../lib/jquery/jquery",
         text: "../lib/requirejs-text/text",
