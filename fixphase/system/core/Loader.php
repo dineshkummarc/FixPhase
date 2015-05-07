@@ -845,9 +845,9 @@ class CI_Loader {
 
 			foreach ($this->_ci_view_paths as $_ci_view_file => $cascade)
 			{
-				if (file_exists($_ci_view_file.$_ci_file))
+				if (file_exists($_ci_view_file.strtolower($_ci_file)))
 				{
-					$_ci_path = $_ci_view_file.$_ci_file;
+					$_ci_path = $_ci_view_file.strtolower($_ci_file);
 					$file_exists = TRUE;
 					break;
 				}

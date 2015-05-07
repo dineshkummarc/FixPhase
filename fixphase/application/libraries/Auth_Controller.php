@@ -12,7 +12,6 @@ class Auth_Controller extends REST_Controller{
 
     function __construct(){
         parent::__construct();
-        echo "auth";
         if(!$this->session->userdata('logged_in')){
             redirect('Login');
         }
