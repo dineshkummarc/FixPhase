@@ -20,19 +20,160 @@ class user_model extends CI_Model{
 
         $query = $this->db->insert('users',$data);
         if($query){
-                return true;
-              }else{
-                return false;
+            return true;
+        }else{
+            return false;
         }
 
     }
 
+    //get user password
+    /**
+     * @author: Abdulaziz Mohamed Alaa
+     */
+    public function get_password($user_id){
+        $this->db->select('password');
+        $query = $this->db->get_where('users', array('user_id' => $user_id));
+        if($query->num_rows() > 0){
+            $row = $query->row();
+            $data = array(
+                'status' => true,
+                'password' => $row->password
+            );
+        }else{
+            $data = array(
+                'status' => false,
+                'password' => ''
+            );
+        }
+        return $data;
+    }
+
+    //updates user password
+    /**
+     * @author: Abdulaziz Mohamed Alaa
+     */
+    public function update_password($user_id, $password){
+        if($this->db->update('users', array('password' => $password), array('user_id' => $user_id))){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    //check if user exits by his username and get his password and email
+    /**
+     * @author: Abdulaziz Mohamed Alaa
+     */
+    public function get_password_email($email){
+
+        $this->db->select('email, password');
+        $query = $this->db->get_where('users', array('email' => $email));
+
+        if($query->num_rows() == 1){
+            $row = $query->row();
+            $data = array(
+                'status' => true,
+                'email' => $row->email,
+                'password' => $row->password
+            );
+        }else{
+            $data = array(
+                'status' => false,
+                'email' => '',
+                'password' => ''
+            );
+        }
+
+        return $data;
+    }
+    //check if user exits by his username and get his password and email
+    /**
+     * @author: Abdulaziz Mohamed Alaa
+     */
+    public function get_password_user_name($username){
+
+        $this->db->select('email, password');
+        $query = $this->db->get_where('users', array('username' => $username));
+
+        if($query->num_rows() == 1){
+            $row = $query->row();
+            $data = array(
+                'status' => true,
+                'email' => $row->email,
+                'password' => $row->password
+            );
+        }else{
+            $data = array(
+                'status' => false,
+                'email' => '',
+                'password' => ''
+            );
+        }
+
+        return $data;
+    }
+    //check if user exits by his username and password
+    /**
+     * @author: Abdulaziz Mohamed Alaa
+     */
+    public function check_user_name($username, $password){
+
+        $this->db->select('user_id, full_name');
+        $query = $this->db->get_where('users', array('username' => $username, 'password' => $password));
+
+        if($query->num_rows() == 1){
+            $row = $query->row();
+            $data = array(
+                'status' => true,
+                'user_id' => $row->user_id,
+                'full_name' => $row->full_name
+            );
+        }else{
+            $data = array(
+                'status' => false,
+                'user_id' => '',
+                'full_name' => ''
+            );
+        }
+
+        return $data;
+    }
+
+    //check if user exists by his email and password
+    /**
+     * @author: Abdulaziz Mohamed Alaa
+     */
+    public function check_user_email($email, $password){
+
+        $this->db->select('user_id, full_name');
+        $query = $this->db->get_where('users', array('email' => $email, 'password' => $password));
+
+        if($query->num_rows() == 1){
+            $row = $query->row();
+            $data = array(
+                'status' => true,
+                'user_id' => $row->user_id,
+                'full_name' => $row->full_name
+            );
+        }else{
+            $data = array(
+                'status' => false,
+                'user_id' => '',
+                'full_name' => ''
+            );
+        }
+
+        return $data;
+    }
+
+
     //<============Moataz============>
-        /**
+    /**
      * This Function used to check is email exists in db
      * @param $email
      * @return bool
-         * Author : Moataz M. Farid
+     * Author : Moataz M. Farid
      */
     public function isemail($email){
         $email = strtolower ($email);
@@ -73,8 +214,8 @@ class user_model extends CI_Model{
     public function logging($user,$email,$password){
         $user = strtolower ($user);
         $email = strtolower ($email);
-    //        var_dump($user); // testing
-    //        var_dump($email); // testing
+        //        var_dump($user); // testing
+        //        var_dump($email); // testing
 
         if($this->isemail($email)&&isset($password)){
             $sql='Select * from `users`  where `email` = ? and `password` = ?';

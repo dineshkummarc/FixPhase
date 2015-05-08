@@ -40,6 +40,7 @@ class Register extends CI_Controller{
                   'role'=> strtolower($this->input->post('role')),
                   'full_name'=> $fname . " " . $lname
               );
+
               if($this->user_model->insert_user($data)){
                   redirect('login');
                   //$this->session->set_userdata($data);
@@ -60,6 +61,7 @@ class Register extends CI_Controller{
                   'fname'=> $this->input->post('Fname'),
                   'lname'=> $this->input->post('Lname')
               );
+
               $this->session->set_userdata('fields',$temp_data);
               $this->load->view('Register_view',$this->session->userdata('fields'));
           }
