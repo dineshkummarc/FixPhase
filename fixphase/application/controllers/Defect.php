@@ -9,7 +9,7 @@ class Defect extends Auth_Controller{
           parent::__construct();
           $this->response->format = 'json';
      }
-     public function index_get($did){
+     public function index_get($did = "index"){
           if($did == 'index' && !$this->get('pid'))
                $this->load->view("errors/no_defect");
           else if(is_numeric($did)){
@@ -42,7 +42,8 @@ class Defect extends Auth_Controller{
      }
      public function comment_get(){
           $did = $this->get('did');
-          if($did){
+          $pid = $this->get('pid');
+          if($did && $pid){
                $this->load->model('comments');
                $result = $this->comments->retrieve_defect_comments($did);
                if($result)
@@ -56,13 +57,18 @@ class Defect extends Auth_Controller{
      public function comment_post(){
           $this->load->model('comments');
           $data = $this->post('data');
-          $comment = array(
-               'project_id' => $data['pid'],
-               'defect_id' => $data['did'],
-               'user_id' => $data['comment']['userid'],
-               'comment' => $data['comment']['comment']
-          );
-          $this->comments->insert($data);
+          if(!$data){
+               $this->response(array('error' => 'Invalid input'));
+          }
+          else{
+               $comment = array(
+                    'project_id' => $data['pid'],
+                    'defect_id' => $data['did'],
+                    'user_id' => $data['comment']['userid'],
+                    'comment' => $data['comment']['comment']
+               );
+               $this->comments->insert($data);
+          }
      }
      public function comment_put(){
           $this->load->model('comments');

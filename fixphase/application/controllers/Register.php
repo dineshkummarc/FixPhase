@@ -33,14 +33,13 @@ class Register extends CI_Controller{
               $this->load->model('user_model');
               $fname= strtolower($this->input->post('Fname'));
               $lname= strtolower($this->input->post('Lname'));
-              /*$data = array(
+              $data = array(
                   'username'=> strtolower($this->input->post('username')),
                   'password'=> strtolower($this->input->post('password')),
                   'email'=> strtolower($this->input->post('email')),
                   'role'=> strtolower($this->input->post('role')),
                   'full_name'=> $fname . " " . $lname
-              );*/
-
+              );
               if($this->user_model->insert_user($data)){
                   redirect('login');
                   //$this->session->set_userdata($data);
@@ -61,7 +60,6 @@ class Register extends CI_Controller{
                   'fname'=> $this->input->post('Fname'),
                   'lname'=> $this->input->post('Lname')
               );
-
               $this->session->set_userdata('fields',$temp_data);
               $this->load->view('Register_view',$this->session->userdata('fields'));
           }
