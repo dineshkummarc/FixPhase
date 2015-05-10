@@ -21,12 +21,32 @@ $(document).ready(function () {
     var closeDialog = $('.close-dialog');
     var searchField = $('.search-box');
 
-    var inviteButton = $('.add-btn');
     var inviteForm = $('.invite');
 
 
 
     var url = "user.json";
+
+    //invite to project POPUP
+    inviteForm.dialog({
+        autoOpen: false,
+        show: {
+            effect: "fade"
+        },
+        modal: true,
+        draggable: false,
+        fluid: true,
+        resizable: false,
+        hide: {
+            effect: "fade"
+        },
+        Close: function () {
+            $(this).dialog("close");
+        },
+        Continue: function () {
+            $(this).dialog("close");
+        }
+    });
 
     $.getJSON(url, function (responese) {
         $.each(responese, function (index, user) {
@@ -41,6 +61,11 @@ $(document).ready(function () {
 
                     //create new invite button for each project
                     var invite_btn = $('<button/>',{type:"button" , class:"add-btn"});
+
+                    invite_btn.click(function () {
+                        inviteForm.dialog("open");
+                    });
+
                     invite_btn.addClass("btn btn-default");  //new class for styling
                     invite_btn.text("+");
 
@@ -97,35 +122,6 @@ $(document).ready(function () {
 
     });
 
-    //invite to project POPUP
-    inviteForm.dialog({
-        autoOpen: false,
-        show: {
-            effect: "fade"
-        },
-        modal: true,
-        draggable: false,
-        fluid: true,
-        resizable: false,
-        hide: {
-            effect: "fade"
-        },
-        Close: function () {
-            $(this).dialog("close");
-        },
-        Continue: function () {
-            $(this).dialog("close");
-        }
-    });
-
-    inviteButton.click(function () {
-        console.log("Invite button clicked.");
-    });
-
-
-
-
-
     //search function
     searchField.keyup(function(){
         var filter = $(this).val();
@@ -133,7 +129,6 @@ $(document).ready(function () {
         var Exp = new RegExp(filter, "i");
 
         $(".dropdown-menu .project-element").each(function(){
-            var visibleEl = $('.dropdown-menu li').find(":visible").not("script");
 
             if ($(this).text().search(Exp) < 0) {
                 $(this).fadeOut();
@@ -141,13 +136,6 @@ $(document).ready(function () {
             else {
                 $(this).show();
                 count++;
-            }
-            if(visibleEl.length == 2){
-                searchResult.show();
-                searchResult.html("Not found");
-            }
-            else if(visibleEl.length > 2){
-                searchResult.hide();
             }
         });
     });
