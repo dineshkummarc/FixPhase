@@ -12,7 +12,7 @@ class Home extends Auth_Controller{
     public function index_get(){
         //GET requests
         echo "get";
-        $this->load->view('home_view');
+        $this->load->view('home_view.html');
     }
 
     public function index_post(){

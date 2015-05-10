@@ -1,7 +1,6 @@
 define(["store"], function(Store){
 
-    // Variables that accept onchange
-    var todos = null;
+    var projects = null;
 
     // store object
     return new Store({
@@ -9,7 +8,7 @@ define(["store"], function(Store){
         //ajax methods should be named according to properties in config/api
         ajaxMethods:{
             /**
-             * Get all todos
+             * Get all projects
              * @param {String}  id           - An identifier for this function passed implicitly by the store class.
              * @param {object}  caller       - The caller object usually "this" is given
              * @param {object}  data         - query arguments to be sent in request (maybe null)
@@ -18,7 +17,7 @@ define(["store"], function(Store){
              * @return {Object} - a promise object.
              *
              * Usage:
-             *                     getTodos(caller,data).done(donefunc).fail(failfunc)
+             *                     getProjects(caller,data).done(donefunc).fail(failfunc)
              *
              * Done & Fail functions:
              *     - done func:
@@ -30,12 +29,12 @@ define(["store"], function(Store){
              *                info -> this is called when the ajax request fails and didnt reach server
              *                arguments ->  errorStatus : "timeout" , "" ....
              */
-            getTodos: function (id, caller, data, disableCache) {
+            getProjects: function (id, caller, data, disableCache) {
                 disableCache = !!disableCache;
-                //if we already have todos and no disableCache return a resolved promise
-                if(todos && !disableCache)
+                //if we already have projects and no disableCache return a resolved promise
+                if(projects && !disableCache)
                 {
-                    return this.makeResolvedPromise(caller, true, todos)
+                    return this.makeResolvedPromise(caller, true, projects)
                 }
 
                 //otherwise fetch result from server
@@ -47,10 +46,10 @@ define(["store"], function(Store){
                     /**
                      * Track the cache of this request so as to ignore recently finished requests if the cache already
                      * has a value. A function is used to make a closure that tracks the cache object.
-                     * @returns {Object} - todo cache
+                     * @returns {Object} - project cache
                      */
                     cache: function () {
-                        return todos;
+                        return projects;
                     },
                     /**
                      * This is called to filter the passed data argument to the callback of the promise returned,
@@ -71,9 +70,9 @@ define(["store"], function(Store){
                         // check if we this is a new get request not a cache
                         if(!cacheRequest)
                         {
-                            todos = data;
+                            projects = data;
                         }
-                        return todos;
+                        return projects;
                     },
 
                     /**
@@ -91,7 +90,7 @@ define(["store"], function(Store){
             }
         },
 
-        createTodo: function (id, caller, data) {
+        createProject: function (id, caller, data) {
             return this.set({
                 id: id,
                 caller: caller,
@@ -105,10 +104,10 @@ define(["store"], function(Store){
                         return data;
                     }
                     //if succeeded then check if we already fetched todos
-                    if(todos)
+                    if(projects)
                     {
                         //if so update it with the new item
-                        todos.push(data);
+                        projects.push(data);
                     }
                     //return the data
                     return data;
@@ -120,8 +119,12 @@ define(["store"], function(Store){
 
         //on setup
         setup: function () {
-            this.observeURL(/example\/todo\//, function () {
+            this.observeURL(/project\/.+/, function (url, urlPath, args) {
+                //if we have projects
+                if(projects)
+                {
 
+                }
             });
         },
 

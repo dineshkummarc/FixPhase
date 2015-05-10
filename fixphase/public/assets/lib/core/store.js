@@ -1,11 +1,133 @@
-define(["jquery", "observer", "identity", "core"], function ($, observer, Identity, core) {
+define(["jquery", "observer", "identity", "core", "promise","api", "reloader"],
+function ($, observer, Identity, core, Promise, rest, api, store, reloader) {
+
+    /**
+     * Used In the begining of a new get request to check if the completed request promise should have its
+     * callbacks called or not.
+     * @param {Object}   store           - The store object
+     * @param {object}   activeCalls     - List of active calls
+     * @param {String}   id              - The function name
+     * @param {Object}   caller          - Object calling the function
+     * @param {Object}   requestInstance - An instance of the current request object
+     * @param {int}      requestedTime   - The time of this request
+     * @param {boolean} isModifyRequest  - Indicate if this is not a get request it is (SET,PUT or DELETE)
+     */
+    var shouldAcceptRequest = function(store, activeCalls, id, caller, requestInstance, requestedTime,
+                                       isModifyRequest)
+    {
+        // check if another request was made before this one finish
+        if(requestInstance.time > requestedTime)
+        {
+            // just ignore this call and dont remove anything, entry will be used by next request
+            return false;
+        }
+
+        //if not a modify request then deal with the reloader
+        if(!isModifyRequest)
+        {
+            // I am the last request from this caller so remove anything in reload because i will handle my response now
+            reloader.removeFromReload(store, id, caller);
+        }
+
+        // check if this request was cancelled, this means that the caller last in active is greater than the
+        // time of request
+        if(requestInstance.time < caller.getLastInActive())
+        {
+            //remove it and return false
+            activeCalls[id][caller.getId()]= undefined;
+            return false;
+        }
+
+        // otherwise remove it from active calls and return true
+        activeCalls[id][caller.getId()] = undefined;
+        return true;
+    };
 
 
+    /**
+     *
+     * @param options
+     * @param activeCalls
+     * @returns {Object} - setup data
+     */
+    var setupRequest = function (options, activeCalls) {
+        if(!options.id || !options.caller)
+        {
+            console.warn("Ajax get: caller and function id should be supplied.");
+            return null;
+        }
+        if(!this[options.id])
+        {
+            console.warn("Ajax get: wrong id passed");
+            return null;
+        }
 
+        var promise = null;
+        // get active function calls
+        var activeFuncCalls = activeCalls[options.id];
+        //if none found create
+        if(!activeFuncCalls)
+        {
+            activeFuncCalls = {};
+            activeCalls[options.id] = activeFuncCalls;
+        }
+
+        //get request instance
+        var requestInstance = activeFuncCalls[options.caller.getId()];
+        //if none found create
+        if(!requestInstance)
+        {
+            //create new request instance and it promise object
+            requestInstance = {promise: new Promise()};
+            activeFuncCalls[options.caller.getId()]= requestInstance;
+        }
+
+        // update/set request time
+        var requestedTime = Date.now();
+        requestInstance.time = requestedTime;
+        //get the promise of the request
+        promise = requestInstance.promise;
+        return {
+            requestedTime: requestedTime,
+            requestInstance: requestInstance
+        };
+
+    };
+
+    /**
+     * Create a method for this object. Used to workaround closure in forloops.
+     * @param data
+     * @param funcname
+     * @returns {Function}
+     */
+    var createFunc = function (data, funcname) {
+        return function () {
+            data.ajaxMethods[funcname].apply(this, [funcname].concat(Array.prototype.slice.call(arguments)));
+        }
+    };
+
+    /**
+     * Store constructor. Ajax methods passed in data arguments are converted to methods of this object,
+     * where they take 3 arguments each: the id (method name actually), caller and data. Method names should have
+     * a correspondig property of the same name in config/api that gives the url used by this ajax method.
+     * @param {Object} data - Holds the object methods as follows
+     * {
+     *      ajaxMethods: {
+     *
+     *          methodname: function (id, caller, data){},
+     *
+     *
+     *      },
+     *
+     *      setup: callback function on setup,
+     *
+     *      exit: callback function on exit
+     * }
+     * @constructor
+     */
     var Store = function (data) {
         //mixin
         Observer.call(this);
-
         //parent constructor
         Identity.call(this);
 
@@ -14,11 +136,33 @@ define(["jquery", "observer", "identity", "core"], function ($, observer, Identi
             _exitFunc,
             _active,
             _local,
-            _ajax
-            ;
+            _ajax,
+            _activeCalls,
+            _lastInActive
+        ;
         _active = false;
         _setupFunc = function () {};
         _exitFunc = function () {};
+        _lastInActive = 0;
+        /*
+         * Saves active calls for this store
+         * {
+         *      funcname: {
+         *                  caller_id: {
+         *                              time:      millisecond,
+         *                              promise:   promise
+         *                             }
+         *                }
+         * }
+         * It is as follow when a get request happens, the store object saves it here under funcname and caller id,
+         * then when the ajax completes either it checks to see if this reuest was cancelled if so then
+         * it dont call its promise callbacks and remove the entry from _activeCalls. Otherwise, it calls the
+         * callbacks and remove the entry from _activeCalls. So callbacks are only removed by the done and fail
+         * methods of the ajax request, those methods gets the request object, caller, and funcname as closures
+         * so they can make the needed checks and remove the entry when done.
+         */
+        _activeCalls = {};
+
 
         //set methods from data object
         if(data){
@@ -30,20 +174,37 @@ define(["jquery", "observer", "identity", "core"], function ($, observer, Identi
             {
                 _exitFunc = data.exit();
             }
-
+            //add methods and call function supplying implicit id parameter
             if(data.ajaxMethods){
-                for(var func in data.ajaxMethods){
-
+                for(var funcname in data.ajaxMethods){
+                    if(!api[funcname])
+                    {
+                        console.warn("Ajax get: function [" + funcname + "] does not have a corresponding api url.");
+                        continue;
+                    }
+                    this[funcname] = createFunc(data,funcname);
                 }
             }
         }
 
         //--- Explicit methods ---//
 
+        /**
+         * Check if this store is currently active.
+         * @returns {boolean}
+         */
         this.isActive = function () {
             return _active;
         };
 
+        this.getLastInActive = function(){
+            return _lastInActive;
+        };
+
+        /**
+         * Called when setting up the store
+         * @returns {boolean}
+         */
         this.setup = function () {
             //if already active skip
             if(this.isActive())
@@ -53,8 +214,12 @@ define(["jquery", "observer", "identity", "core"], function ($, observer, Identi
             _active = true;
             _setupFunc.call(this);
             return true;
-        }
+        };
 
+        /**
+         * Called when exiting the store
+         * @returns {boolean}
+         */
         this.exit = function () {
             //if already exit skip
             if(!this.isActive())
@@ -69,17 +234,236 @@ define(["jquery", "observer", "identity", "core"], function ($, observer, Identi
             }
 
             _active = false;
+            _lastInActive = Date.now();
 
             //remove all observe events
             this.unobserveAll();
 
             _exitFunc.call(this);
             return true;
-        }
+        };
+
+        /**
+         * Create a resolved promise, where callbacks will have caller as its context and will receive success & data
+         * as arguments.
+         * @param {object} caller - An object of type identifier, where the callback have this as its context
+         * @param {boolean} success - indicates whether data is an error msg or actual data
+         * @param {object } data
+         */
+        this.makeResolvedPromise = function (caller, success, data) {
+            //make new promise object
+            var promise = new Promise();
+            //set the done & create callback filter to handle context and passed arguments
+            promise.setDone(function (f) {
+                f.call(caller,success,data);
+            });
+            return promise;
+        };
+
+        /**
+         * Used to issue a tracked get request, that makes sure to save attached callbacks so if a new request is
+         * made while the previous hasn't finish yet then it would ignore the previous and use the new one, also
+         * the saved callbacks allows to cancel them if the componenet that requested them are
+         * @param {Object} options - An object containing options as follows :
+         * {
+         *      id:                   [required] use the id param passed implicitly to the store method
+         *      caller:               [required] the caller calling the store method
+         *      data:                 [optional] query to be passed to server
+         *      filterDoneArguments:  [optional] filter the passed data argument to done promise callbacks
+         *      filterFailedArguments:[optional] filter the passed data argument to fail promise callbacks
+         * }
+         * @returns {Object} - A promise
+         */
+        this.get = function (options) {
+            var setup = setupRequest(options, _activeCalls);
+            if(!setup)
+            {
+                return new Promise();
+            }
+
+            //call ajax
+            $.ajax({
+                url: api[options.id],
+                method: "GET",
+                data: data,
+                dataType: "json"
+            })
+                .done(function (data) {
+                    // check if we should accept this request
+                    if (!shouldAcceptRequest(this, _activeCalls, options.id, options.caller,
+                            setup.requestInstance, setup.requestedTime, false)) {
+                        return;
+                    }
+
+                    // we should accept it so start handling the response
+                    // make returned data the data object
+                    var returnedData = data.data;
+                    // and assume it succeeded
+                    var success = true;
+
+                    var cacheRequest = true;
+                    //check if we shouldnot use cache
+                    if(options.disableCache || !options.cache())
+                    {
+                        cacheRequest = false;
+                        if(data.error)
+                        {
+                            // make returned data the error obj and make success false
+                            success = false;
+                            returnedData = data.error;
+                        }
+                    }
+                    else if(!options.disableCache && options.cache()){ // use cache
+                        returnedData = options.cache();
+                        success = true;
+                    }
+
+                    // now pass to filter if exist
+                    if(options.filterDoneArguments)
+                    {
+                        // get filter result and make it our new returned data
+                        returnedData = options.filterDoneArguments(success, returnedData, cacheRequest);
+                    }
+
+                    // now resolve the promise object to call its callbacks passing a filter
+                    // to set the correct context and arguments of callbacks
+                    setup.requestInstance.promise.setDone(function (f) {
+                        f.call(options.caller,success,returnedData);
+                    });
+
+                    //resolve all others requests as me
+                    reloader.resolveRequest(this, options.id, success, returnedData);
+
+                })
+                .fail(function (jqXHR, statusMsg) {
+                    // check if we should accept this request
+                    if(!shouldAcceptRequest(this, _activeCalls, options.id, options.caller,
+                            setup.requestInstance, setup.requestedTime, false)) {
+                        return;
+                    }
+
+                    //check if we should use cache
+                    var cacheRequest = false;
+                    if(!options.disableCache && options.cache())
+                    {
+                        cacheRequest = true;
+                        returnedData = options.cache();
+                        // now pass to filter if exist
+                        if(options.filterDoneArguments)
+                        {
+                            // get filter result and make it our new returned data
+                            returnedData = options.filterDoneArguments(true, returnedData, cacheRequest);
+                        }
+
+                        setup.requestInstance.promise.setDone(function (f) {
+                            f.call(options.caller,true,returnedData);
+                        });
+                        return;
+                    }
+
+                    // otherwise we should accept it so start handle the response
+                    var returnedData = statusMsg;
+
+                    // pass to filter if exist
+                    if(options.filterFailedArguments)
+                    {
+                        // get filter result and make it our new returned data
+                        returnedData = options.filterFailedArguments(jqXHR, returnedData)
+                    }
+
+                    // now simulate the failed promise object to call its callbacks passing a filter
+                    // to set the correct context and arguments of callbacks
+                    setup.requestInstance.promise.simulateFailed(function (f) {
+                        f.call(options.caller,returnedData);
+                    });
+
+                    //add this request to the need to reload
+                    reloader.addToReload(this, options.id, options.caller, requestInstance);
+
+                });
+            return setup.promise;
+        };
+
+        this.set = function (options) {
+            var setup = setupRequest(options, _activeCalls);
+            if(!setup)
+            {
+                return new Promise();
+            }
+            if(!options.method)
+            {
+                options.method = "POST";
+                console.log("Warning no method set for ajax method: " + options.id);
+            }
+            //call ajax
+            $.ajax({
+                url: api[options.id],
+                method: options.method,
+                data: data,
+                dataType: "json"
+            })
+                .done(function (data) {
+                    // check if we should accept this request
+                    if (!shouldAcceptRequest(this, _activeCalls, options.id, options.caller,
+                            setup.requestInstance, setup.requestedTime, true)) {
+                        return;
+                    }
+
+                    // we should accept it so start handling the response
+                    // make returned data the data object
+                    var returnedData = data.data;
+                    // and assume it succeeded
+                    var success = true;
+
+                    if(data.error)
+                    {
+                        // make returned data the error obj and make success false
+                        success = false;
+                        returnedData = data.error;
+                    }
+
+                    // now pass to filter if exist
+                    if(options.filterDoneArguments)
+                    {
+                        // get filter result and make it our new returned data
+                        returnedData = options.filterDoneArguments(success, returnedData);
+                    }
+
+                    // now resolve the promise object to call its callbacks passing a filter
+                    // to set the correct context and arguments of callbacks
+                    setup.requestInstance.promise.setDone(function (f) {
+                        f.call(options.caller,success,returnedData);
+                    });
+
+                })
+                .fail(function (jqXHR, statusMsg) {
+                    // check if we should accept this request
+                    if(!shouldAcceptRequest(this, _activeCalls, options.id, options.caller,
+                            setup.requestInstance, setup.requestedTime, true)) {
+                        return;
+                    }
+
+                    // we should accept it so start handle the response
+                    var returnedData = statusMsg;
+
+                    // pass to filter if exist
+                    if(options.filterFailedArguments)
+                    {
+                        // get filter result and make it our new returned data
+                        returnedData = options.filterFailedArguments(jqXHR, returnedData)
+                    }
+
+                    // now set failed promise object to call its callbacks passing a filter
+                    // to set the correct context and arguments of callbacks
+                    setup.requestInstance.promise.setFailed(function (f) {
+                        f.call(options.caller,returnedData);
+                    });
+
+                });
+            return setup.promise;
+        };
 
     };
-
-
 
 
     Store.prototype = new Identity();

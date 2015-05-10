@@ -5,6 +5,12 @@ requirejs.config({
         text: "../lib/requirejs-text/text",
         css : "../lib/require-css/css",
 
+        //config
+        routes: "config/routes",
+        api: "config/api",
+
+
+        //framework
         identity: "../lib/core/identity",
         core: "../lib/core/core",
         router: "../lib/core/router",
@@ -15,14 +21,15 @@ requirejs.config({
         gui: "../lib/core/gui",
         page: "../lib/core/page",
         widget: "../lib/core/widget",
-
-        store: "../lib/core/store"
+        store: "../lib/core/store",
+        promise: "../lib/core/promise",
+        reloader: "../lib/core/reloader"
 
     }
 });
 
 
-require(["core","router","config/routes"], function(core,router,routes){
+require(["core","router","routes"], function(core,router,routes){
     //Register the routes in the router library
     router.registerRoutes(routes);
 
