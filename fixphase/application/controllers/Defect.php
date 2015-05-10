@@ -10,7 +10,7 @@ class Defect extends Auth_Controller{
           $this->response->format = 'json';
      }
      public function index_get($did = "index"){
-          if($did == 'index' && !$this->get('pid'))
+          if($did == 'index' && !$this->get('pid') && !$this->get('did'))
                $this->load->view("errors/no_defect");
           else if(is_numeric($did)){
                $this->load->model("defect_model");
@@ -20,9 +20,9 @@ class Defect extends Auth_Controller{
                else
                     $this->load->view("defect_view", $result);
           }
-          else if($this->get('pid') && $this->get('did'))
+          else if($this->get('user_id') && $this->get('did'))
                $this->view($this->get('did'));
-          else if($this->get('pid') && !$this->get('did'))
+          else if($this->get('user_id') && $this->get('pid'))
                $this->viewall($this->get('pid'));
      }
 
@@ -49,14 +49,15 @@ class Defect extends Auth_Controller{
                if($result)
                     $this->response($result);
                else
-                    $this->response(array('error' => 'Comment not found'),404);
+                    $this->response(404);
           }
           else
-               $this->response(array('error' => 'Comment not found'),404);
+               $this->response(404);
      }
      public function comment_post(){
           $this->load->model('comments');
           $data = $this->post('data');
+          $this->response($_POST);
           if(!$data){
                $this->response(array('error' => 'Invalid input'));
           }
@@ -95,28 +96,30 @@ class Defect extends Auth_Controller{
                $this->index_get($method);
           }
      }
+     protected function authorized($user_id, $project_id){
+          $this->load->model("user_model");
+          $this->session->set_userdata(array('user_id' => 515165));
+          return $this->user_model->is_authorized($user_id, $project_id);
+     }
      protected function view($id){ //RESPOND WITH THIS DEFECT
                $this->load->model("defect_model");
+               if(!$this->authorized($this->session->userdata('user_id'), $id))
+                    $this->response(array('error' => 1));
                $result = $this->defect_model->retrieve($id);
                if($result == false)
-                    $this->response(array('error' => 'Defect not found'), 404);
+                    $this->response(404);
                else
                     $this->response($result);
      }
      protected function viewall($id){ //GET ALL THE DEFECTS FOR A GIVEN PROJECT ID
           $this->load->model('defect_model');
+          if(!$this->authorized($this->session->userdata('user_id'), $id))
+               $this->response(array('error' => 1));
           $Defects = $this->defect_model->retrieveAll($id); //Get all defects for project of id = $id
           $Prj_Defects = array();
           $project;
           if(!$Defects){ //No defects found, Raise an error
-               $project = array(
-                    'session_id' => $this->session->userdata('session_id'),
-                    'data' => null,
-                    'error' => array(
-                         'status' => true,
-                         'message' => "No defects were found"
-                    )
-               );
+               $project = 404;
           }
           else {
                foreach($Defects as $defect){ //All is well, Customize what should be sent through JSON
@@ -140,7 +143,6 @@ class Defect extends Auth_Controller{
           $this->response($project);
      }
      public function create($project = "none"){ //Create a new defect
-          $this->session->set_userdata(array("session_id" => 3));
           $this->load->model("project_model");
           $this->load->library('upload', array(
                                              'upload_path' => "../public/uploads",
