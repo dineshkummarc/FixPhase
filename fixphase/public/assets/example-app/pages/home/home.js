@@ -3,7 +3,7 @@ define(
         "text!pages/home/home.html!strip",
         "page",
         'jquery',
-        "css!pages/home/home.css",
+        "css!pages/home/home.css"
     ],
     function (html, Page, $) {
 
