@@ -15,6 +15,10 @@ class Auth_Controller extends REST_Controller{
         if(!$this->session->userdata('logged_in')){
             redirect('Login');
         }
+        if (!$this->input->is_ajax_request()) {
+            echo $this->load->view('home_view.html', '', TRUE);
+            die();
+        }
     }
 
 }
