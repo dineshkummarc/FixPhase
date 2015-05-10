@@ -24,7 +24,7 @@ class Login extends CI_Controller{
   public function index($msg = null){
     if($this->session->userdata('logged_in')){ // Moataz: This variable check whether you are validated or not
         //header("Location: ".base_url()."Home");// what is this for ?? asked By Moataz
-        redirect('Home');
+        redirect('/');
     }else{
         // Make it load the default login form in case he isn't logged in
         $data['msg']=$msg;
@@ -105,7 +105,7 @@ class Login extends CI_Controller{
                 $this->index("Wrong user/pass");
             }
         }else{
-            redirect('Home');
+            redirect('/');
         }
   }
 
