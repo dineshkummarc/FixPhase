@@ -98,7 +98,7 @@ class Login extends CI_Controller{
 
 
                 ///// logging check complete you can redirect to whatever you want
-                redirect('Home');// go to home view
+                redirect('/');// go to home view
 
             }else{
                 $this->session->set_userdata('logged_in',false);

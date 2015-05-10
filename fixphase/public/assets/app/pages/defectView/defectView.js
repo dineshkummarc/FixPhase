@@ -1,6 +1,3 @@
-var editFlag = false;
-var commentCount = 1;
-
 define(
     [
         "text!pages/defectView/defectView.html!strip",
@@ -9,7 +6,13 @@ define(
         "css!pages/defectView/defectView.css",
     ],
     function (html, Page, $) {
-
+        var editFlag = false;
+        var commentCount = 1;
+        function addComment() {
+            $("#comments #comments-section #"+commentCount+"").html('<p id="commentator">Ali Korayem</p><p id="commentText">'+commentCount+'</p>');
+            $("#comments #comments-section #"+commentCount+"").html('<br>');
+            $("#comments #comments-section #"+commentCount+"").html('<div id="'+(commentCount++)+'"></div>');
+        }
         return new Page({
 
             //a must have property where content are setup
@@ -66,15 +69,7 @@ define(
 
             //all url observe goes here
             observeURLS: function () {
-                var content = this.getContent();
 
-                //match "example/anything but slash"
-                this.observeURL(/example\/[^/]/, function (url, urlPath, args) {
-                    if(args.name)
-                    {
-                        content.find("p").text(args.name);
-                    }
-                })
             },
 
             //called when the page is in view
@@ -83,22 +78,13 @@ define(
                 //access content
                 var content = this.getContent();
 
-                console.log("Home-Page: called start");
             },
 
             exit: function(){
-                console.log("Home-Page: called exit");
             }
         });
 
     }
 );
 
-function addComment() {
-	
-	$("#comments #comments-section #"+commentCount+"").html('<p id="commentator">Ali Korayem</p><p id="commentText">'+commentCount+'</p>');
-	$("#comments #comments-section #"+commentCount+"").html('<br>');
-	$("#comments #comments-section #"+commentCount+"").html('<div id="'+(commentCount++)+'"></div>');
-	
-	
-}
+

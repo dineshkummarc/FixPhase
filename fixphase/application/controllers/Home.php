@@ -11,13 +11,11 @@ require_once APPPATH.'/libraries/Auth_Controller.php';
 class Home extends Auth_Controller{
     public function index_get(){
         //GET requests
-        echo "get";
         $this->load->view('home_view.html');
     }
 
     public function index_post(){
         //POST requests
-        echo "post";
     }
 
     public function index_delete(){

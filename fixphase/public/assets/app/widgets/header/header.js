@@ -3,7 +3,9 @@ define(
         "text!widgets/header/header.html!strip",
         "widget",
         'jquery',
-        "css!widgets/header/header.css"
+        "css!widgets/header/header.css",
+        "css!smoothness",
+        "jquery-ui/dialog"
     ],
     function (html, Widget, $) {
 
@@ -15,7 +17,7 @@ define(
                 //register any DOM events here, like onClick
                 var self = this;
 
-                var username = content.find('.username').text();
+                var userID = content.find('.username').text();
 
                 var dropDownMenu = content.find('.project-menu');
                 var projectElement = content.find('.project-element');
@@ -28,28 +30,9 @@ define(
 
                 var inviteForm = content.find('.invite');
 
-                var url = "user.json";
+                var url = "/assets/app/widgets/header/user.json";
 
-                //invite to project POPUP
-                inviteForm.dialog({
-                    autoOpen: false,
-                    show: {
-                        effect: "fade"
-                    },
-                    modal: true,
-                    draggable: false,
-                    fluid: true,
-                    resizable: false,
-                    hide: {
-                        effect: "fade"
-                    },
-                    Close: function () {
-                        $(this).dialog("close");
-                    },
-                    Continue: function () {
-                        $(this).dialog("close");
-                    }
-                });
+                var gotJson = false;
 
                 $.getJSON(url, function (responese) {
                     $.each(responese, function (index, user) {
@@ -96,25 +79,7 @@ define(
 
 
                 //create new project POPUP
-                addProjectForm.dialog({
-                    autoOpen: false,
-                    show: {
-                        effect: "fade"
-                    },
-                    modal: true,
-                    draggable: false,
-                    fluid: true,
-                    resizable: false,
-                    hide: {
-                        effect: "fade"
-                    },
-                    Close: function () {
-                        $(this).dialog("close");
-                    },
-                    Continue: function () {
-                        $(this).dialog("close");
-                    }
-                });
+
 
                 addProjectBtn.click(function () {
                     addProjectForm.dialog("open");
@@ -156,8 +121,49 @@ define(
             start: function () {
                 //access content
                 var content = this.getContent();
+                var inviteForm = content.find('.invite');
+                var addProjectForm = content.find('.addNewProject');
 
-                console.log("Header-Widget: called start");
+                //invite to project POPUP
+                inviteForm.dialog({
+                    autoOpen: false,
+                    show: {
+                        effect: "fade"
+                    },
+                    modal: true,
+                    draggable: false,
+                    fluid: true,
+                    resizable: false,
+                    hide: {
+                        effect: "fade"
+                    },
+                    Close: function () {
+                        $(this).dialog("close");
+                    },
+                    Continue: function () {
+                        $(this).dialog("close");
+                    }
+                });
+
+                addProjectForm.dialog({
+                    autoOpen: false,
+                    show: {
+                        effect: "fade"
+                    },
+                    modal: true,
+                    draggable: false,
+                    fluid: true,
+                    resizable: false,
+                    hide: {
+                        effect: "fade"
+                    },
+                    Close: function () {
+                        $(this).dialog("close");
+                    },
+                    Continue: function () {
+                        $(this).dialog("close");
+                    }
+                });
             },
 
             exit: function(){
