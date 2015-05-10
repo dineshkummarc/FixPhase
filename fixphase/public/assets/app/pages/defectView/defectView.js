@@ -1,44 +1,98 @@
-	var editFlag = false;
+var editFlag = false;
 var commentCount = 1;
 
-	function editDesc() {
-		var titleVal;
-		var descVal;
-		var projectVal;
-		var versionVal;
-		if(!editFlag)
-		{
-			editFlag = true;
-			titleVal = $('#title p').text();
-			descVal = $('#desc p').text();
-			projectVal = $('#project p').text();
-			versionVal = $('#version p').text();
+define(
+    [
+        "text!pages/defectView/defectView.html!strip",
+        "page",
+        'jquery',
+        "css!pages/defectView/defectView.css",
+    ],
+    function (html, Page, $) {
 
-			$('#desc').html("<div id='edesc'><textarea>"+descVal+"</textarea></div>");
-			$('#title').html("<div id='etitle'><input type='text' value="+titleVal+"></div>");
-			$('#project').html("<div id='eproject'><input type='text' value="+projectVal+"></div>");
-			$('#version').html("<div id='eversion'><input type='text' value="+versionVal+"></div>");
+        return new Page({
+
+            //a must have property where content are setup
+            makeContent: function () {
+                var content = $(($.parseHTML($.trim(html)))[0]);
+
+                //save this variable to use it in events callback
+                var self = this;
+                //register any DOM events here, like onClick
+                content.find("#buttonset").click(function () {
+					
+					var titleVal;
+					var descVal;
+					var projectVal;
+					var versionVal;
+					if(!editFlag)
+					{
+						editFlag = true;
+						titleVal = content.find('#title p').text();
+						descVal = content.find('#desc p').text();
+						projectVal = content.find('#project p').text();
+						versionVal = content.find('#version p').text();
+
+						content.find('#desc').html("<div id='edesc'><textarea>"+descVal+"</textarea></div>");
+						content.find('#title').html("<div id='etitle'><input type='text' value="+titleVal+"></div>");
+						content.find('#project').html("<div id='eproject'><input type='text' value="+projectVal+"></div>");
+						content.find('#version').html("<div id='eversion'><input type='text' value="+versionVal+"></div>");
 
 
-			$('#buttonset').html("<button onclick='editDesc()'>Save</button>");
+						content.find('#buttonset').html("<button onclick='editDesc()'>Save</button>");
 
-		}
-		else {
-			editFlag = false;
-			descVal = $('#edesc textarea').val();
-			titleVal = $('#etitle input').val();
-			projectVal = $('#eproject input').val();
-			versionVal = $('#eversion input').val();
+					}
+					else {
+						editFlag = false;
+						descVal = content.find('#edesc textarea').val();
+						titleVal = content.find('#etitle input').val();
+						projectVal = content.find('#eproject input').val();
+						versionVal = content.find('#eversion input').val();
 
-			$('#edesc').html("<div id='desc'><p>"+descVal+"</p></div>");
-			$('#etitle').html("<div id='title'><p>"+titleVal+"</p></div>");
-			$('#eproject').html("<div id='project'><p>"+projectVal+"</p></div>");
-			$('#eversion').html("<div id='version'><p>"+versionVal+"</p></div>");
+						content.find('#edesc').html("<div id='desc'><p>"+descVal+"</p></div>");
+						content.find('#etitle').html("<div id='title'><p>"+titleVal+"</p></div>");
+						content.find('#eproject').html("<div id='project'><p>"+projectVal+"</p></div>");
+						content.find('#eversion').html("<div id='version'><p>"+versionVal+"</p></div>");
 
-			$('#buttonset').html("<button onclick='editDesc()'>Edit Defect</button>");
+						content.find('#buttonset').html("<button onclick='editDesc()'>Edit Defect</button>");
 
-		}
-	}
+					}
+					
+                });
+
+
+                return content;
+            },
+
+            //all url observe goes here
+            observeURLS: function () {
+                var content = this.getContent();
+
+                //match "example/anything but slash"
+                this.observeURL(/example\/[^/]/, function (url, urlPath, args) {
+                    if(args.name)
+                    {
+                        content.find("p").text(args.name);
+                    }
+                })
+            },
+
+            //called when the page is in view
+            //you can fetch data and show them here on startup if you want
+            start: function () {
+                //access content
+                var content = this.getContent();
+
+                console.log("Home-Page: called start");
+            },
+
+            exit: function(){
+                console.log("Home-Page: called exit");
+            }
+        });
+
+    }
+);
 
 function addComment() {
 	
