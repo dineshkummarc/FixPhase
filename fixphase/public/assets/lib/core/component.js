@@ -36,6 +36,7 @@ define(["identity", "core", "jquery"], function(Identity, core, $ ){
             _startFunc,
             _exitFunc,
             _active,
+            _lastInActive,
             _started,
             _usedWidgets,
             _makeContent
@@ -43,6 +44,7 @@ define(["identity", "core", "jquery"], function(Identity, core, $ ){
 
         _active = false;
         _started = false;
+        _lastInActive = 0;
         _usedWidgets = [];
         _startFunc = function () {};
         _exitFunc = function () {};
@@ -82,7 +84,10 @@ define(["identity", "core", "jquery"], function(Identity, core, $ ){
         };
         this.isStarted = function () {
             return _started;
-        }
+        };
+        this.getLastInActive = function(){
+            return _lastInActive;
+        };
 
         /**
          * Recursively get all elements that needs to be loaded by component.
@@ -164,6 +169,7 @@ define(["identity", "core", "jquery"], function(Identity, core, $ ){
             if(!this.isActive())
                 return false;
 
+
             //if exit called but this view will be inserted in the next view then detach content and stay still
             if(core.isInNextView(this))
             {
@@ -182,6 +188,7 @@ define(["identity", "core", "jquery"], function(Identity, core, $ ){
             //set inactive when finishing user exit function
             _active = false;
             _started = false;
+            _lastInActive = Date.now();
 
             //call the user specified exit function
             _exitFunc.call(this);

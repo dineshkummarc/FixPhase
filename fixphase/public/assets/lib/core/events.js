@@ -26,7 +26,7 @@ define([], function() {
 
         //check if given event already exist
         var event = events[regex];
-        if(event)
+        if(event !== undefined)
         {
             //check if this object already have callbacks in this event
             if(event.callbacks[id] === undefined) {
@@ -62,7 +62,7 @@ define([], function() {
     unregisterEvent = function (id, regex) {
         //check if event exist
         var event = events[regex];
-        if(event)
+        if(event !== undefined)
         {
             //check if the given object have a callback in this event
             if(event.callbacks[id] !== undefined)
