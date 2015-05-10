@@ -94,4 +94,14 @@ class user_model extends CI_Model{
             return false;
         }
     }
+    public function is_authorized($user_id, $project_id){
+          $this->db->where(array('user_id' => $user_id,
+                                 'project_assigned' => $project_id
+          ));
+          $query = $this->db->get('contributor');
+          if($query->num_rows() == 1)
+               return true;
+          else
+               return false;
+    }
 }
