@@ -20,13 +20,18 @@
     "requirejs-router": "~0.8.0",
     "requirejs": "~2.1.17",
     "requirejs-text": "~2.0.14",
-    "require-css": "~0.1.8"
+    "require-css": "~0.1.8",
+    "jquery-ui": "~1.11.4"
   },
   "install": {
     "path": "fixphase/public/assets/lib/",
     "sources": {
       "jquery": [
         "bower_components/jquery/dist/*.+(map|js)"
+      ],
+      "jquery-ui": [
+        "bower_components/jquery-ui/themes/*",
+        "bower_components/jquery-ui/*.+(map|js)"
       ]
     }
   }
