@@ -1,9 +1,9 @@
 define(
     [
-        "text!skeletons/basic/basic.html!strip",
+        "text!skeletons/nav/nav.html!strip",
         "skeleton",
         'jquery',
-        "css!skeletons/basic/basic.css"
+        "css!skeletons/nav/nav.css"
     ],
     function (html, Skeleton, $) {
 
