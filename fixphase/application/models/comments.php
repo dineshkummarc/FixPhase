@@ -22,6 +22,7 @@ class Comments extends CI_Model{
      public function update($data, $where){
           $this->db->where(array('comment_id' => $where));
           $this->db->update('comment', $data);
+          return $this->db->affected_rows();
      }
      public function delete($data){
           $this->db->delete('comment', $data);
