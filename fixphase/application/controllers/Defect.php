@@ -27,18 +27,63 @@ class Defect extends Auth_Controller{
      }
 
      public function index_post(){
-          //POST requests
-          echo "post";
+          $defect = $this->post('defect');
+          if(! $this->authorized($defect['user_id'], $defect['project_id']))
+               $this->response(array('error' => array('id' => 1)));
+          $this->load->model('defect_model');
+          $data = array(
+                         'title' => $defect['title'],
+                         'description' => $defect['description'],
+                         'status' => $defect['status'],
+                         'date_raised' => date('Y-m-d'),
+                         'related_project_id' => $defect['pid'],
+                         'created_by' => $defect['user_id'],
+                         'assigned_to' => isset($defect['assigned_to']) ? $defect['assigned_to']:$defect['user_id'],
+                         'severity' => $defect['severity'],
+                         'priority' => $defect['priority']
+          );
+          $status = $this->defect_model->insert($data);
+          if(is_numeric($status))
+               $this->response('',200);
+          else
+               $this->response('', 404);
      }
 
      public function index_delete(){
-          //DELETE requests
-          echo "delete";
+          $data = $this->delete('defect');
+          if(! $this->authorized($defect['user_id'], $this->get_project_of($defect['did'])))
+               $this->response(array('error' => array('id' => 1)));
+          $this->load->model('defect_model');
+          $status = $this->defect_model->delete($data['did']);
+          if($status == 1)
+               $this->response('', 200);
+          else
+               $this->response('', 404);
      }
-
      public function index_put(){
-          //PUT requests
-          echo "put";
+         $defect = $this->put('defect');
+          if(! $this->authorized($defect['user_id'], $this->get_project_of($defect['did']))
+               $this->response(array('error' => array('id' => 1)));
+          $this->load->model('defect_model');
+          $data = array(
+                         'title' => $defect['title'],
+                         'description' => $defect['description'],
+                         'status' => 'Open',
+                         'assigned_to' => $defect['assigned_to'],
+                         'severity' => $defect['severity'],
+                         'priority' => $defect['priority'],
+                         'target_resolution_date' => $defect['target_date'],
+                         'actual_resolution_date' => $defect['actual_date'],
+                         'date_closed' => $defect['date_closed'],
+                         'note' => $defect['note'],
+                         'version' => $defect['version'],
+                         'platform' => $defect['platform']
+          );
+          $status = $this->defect_model->update($data, $defect['did']);
+          if($status == 1)
+               $this->response('',200);
+          else
+               $this->response('', 404);
      }
      public function comment_get(){
           $did = $this->get('did');
@@ -61,15 +106,16 @@ class Defect extends Auth_Controller{
      public function comment_post(){
           $this->load->model('comments');
           $data = $this->post('data');
-          $this->response($_POST);
           if(!$data){
-               $this->response(array('error' => 'Invalid input'));
+               $this->response(array('error' => 2));
           }
           else{
+               if(!$this->authorized($data['user_id']), $data['pid'])
+                    $this->response(array('error' => array('id' => 1)));
                $comment = array(
                     'project_id' => $data['pid'],
                     'defect_id' => $data['did'],
-                    'user_id' => $data['comment']['userid'],
+                    'user_id' => $data['comment']['user_id'],
                     'comment' => $data['comment']['comment']
                );
                $this->comments->insert($data);
@@ -78,13 +124,20 @@ class Defect extends Auth_Controller{
      public function comment_put(){
           $this->load->model('comments');
           $data = $this->put('data');
+          if(!$data){
+               $this->response(array('error' => 2));
+          }
+          else{
+          if(!$this->authorized($data['user_id']), $data['pid'])
+               $this->response(array('error' => array('id' => 1)));
           $comment =  array(
                'project_id' => $data['pid'],
                'defect_id' => $data['did'],
-               'user_id' => $data['comment']['userid'],
+               'user_id' => $data['comment']['user_id'],
                'comment' => $data['comment']['comment']
           );
-          $where = $data['cid'];
+          $this->comments->update($comment, $data['cid']);
+          }
      }
      public function comment_delete(){
           $this->load->model('comments');

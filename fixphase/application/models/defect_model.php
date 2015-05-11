@@ -26,4 +26,13 @@ class defect_model extends CI_Model{
           $result = $this->db->get('defect');
           return $result->result()[0]->related_project_id;
      }
+     public function update($data, $where){
+          $this->db->where(array('defect_id' => $where));
+          $this->db->update('defect', $data);
+          return $this->db->affected_rows();
+     }
+     public function delete($id){
+          $this->db->delete('defect', array('did' => $id));
+          return $this->db->affected_rows();
+     }
 }
