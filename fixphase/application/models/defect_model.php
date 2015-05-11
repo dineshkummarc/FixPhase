@@ -21,4 +21,9 @@ class defect_model extends CI_Model{
           $this->db->insert('defect', $data);
           return $this->db->insert_id();
      }
+     public function get_project($id){
+          $this->db->where(array('defect_id' => $id));
+          $result = $this->db->get('defect');
+          return $result->result()[0]->related_project_id;
+     }
 }

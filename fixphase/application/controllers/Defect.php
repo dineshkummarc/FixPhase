@@ -42,17 +42,21 @@ class Defect extends Auth_Controller{
      }
      public function comment_get(){
           $did = $this->get('did');
-          $pid = $this->get('pid');
-          if($did && $pid){
+          $user_id = $this->get('user_id');
+          if($did && $user_id){
                $this->load->model('comments');
                $result = $this->comments->retrieve_defect_comments($did);
-               if($result)
-                    $this->response($result);
+               if($result){
+                    if(!$this->authorized($user_id, $this->get_project_of($did)))
+                         $this->response(array('error' => array('id' => 1)));
+                    else
+                         $this->response($result);
+               }
                else
-                    $this->response(404);
+                    $this->response('',404);
           }
           else
-               $this->response(404);
+               $this->response('',404);
      }
      public function comment_post(){
           $this->load->model('comments');
@@ -98,23 +102,28 @@ class Defect extends Auth_Controller{
      }
      protected function authorized($user_id, $project_id){
           $this->load->model("user_model");
-          $this->session->set_userdata(array('user_id' => 515165));
           return $this->user_model->is_authorized($user_id, $project_id);
+     }
+     protected function get_project_of($id){
+          $this->load->model('defect_model');
+          $result = $this->defect_model->get_project($id);
+          if(is_numeric($result))
+               return $result;
+          else return -1;
      }
      protected function view($id){ //RESPOND WITH THIS DEFECT
                $this->load->model("defect_model");
-               if(!$this->authorized($this->session->userdata('user_id'), $id))
-                    $this->response(array('error' => 1));
                $result = $this->defect_model->retrieve($id);
                if($result == false)
-                    $this->response(404);
-               else
+                    $this->response('',404);
+               else{
+                    if(!$this->authorized($this->get('user_id'), $this->get_project_of($id)))
+                         $this->response(array('error' => array('id' => 1)));
                     $this->response($result);
+               }
      }
      protected function viewall($id){ //GET ALL THE DEFECTS FOR A GIVEN PROJECT ID
           $this->load->model('defect_model');
-          if(!$this->authorized($this->session->userdata('user_id'), $id))
-               $this->response(array('error' => 1));
           $Defects = $this->defect_model->retrieveAll($id); //Get all defects for project of id = $id
           $Prj_Defects = array();
           //$project;
@@ -138,9 +147,15 @@ class Defect extends Auth_Controller{
                          'status' => false,
                          'message' => ""
                     )
-               );
+               )    ;
           }
-          $this->response($project);
+          if($project == 404)
+               $this->response('', 404);
+          else{
+               if(!$this->authorized($this->get('user_id'), $id))
+                    $this->response(array('error' => array('id' => 1)));
+               $this->response($project);
+          }
      }
      public function create($project = "none"){ //Create a new defect
           $this->load->model("project_model");
