@@ -16,64 +16,67 @@
         <div class="container-fluid">
 			<div class="row">
 				<div style="width:21%; margin-left:40%" class="col-sm-3 col-sm-offset-5 col-xs-4 col-xs-offset-4">
-                <img src=<?php echo base_url()."assets/images/logo.png";?> id="logo"/>
-            </div>
-            <?php echo validation_errors(); ?>
-            <?php
-            $attr = array('class' => '', 'id' => '');
-            echo form_open('Login/validate', $attr);
-            ?>
-                <div class="login">
+                    <img src=<?php echo base_url()."assets/images/logo.png";?> id="logo"/>
+                </div>
+			</div>
+
+			<div class="login col-md-4 col-md-offset-4 col-sm-5 col-sm-offset-4 col-xs-6 col-xs-offset-3">
+                    <?php echo validation_errors(); ?>
+                    <?php
+                    $attr = array('class' => '', 'id' => '');
+                    echo form_open('Login/validate', $attr);
+                    ?>
                     <?php if(! is_null($msg)) echo $msg;?><br/><br/>
-                    <div class="form-group">
-                        <?php
-                        $attr = array(
-                            'type' => 'email|username',
-                            'class' => 'form-control',
-                            'id' => 'email',
-                            'placeholder' => 'Email Address Or User Name',
-                            'name' => 'user_email'
-                        );
-                        echo form_input($attr);
-                        ?>
-                    </div>
-                    <div class="form-group">
-                        <?php
-                        $attr = array(
-                            'type' => 'password',
-                            'class' => 'form-control',
-                            'id' => 'pass',
-                            'placeholder' => 'Password',
-                            'name' => 'password'
-                        );
-                        echo form_password($attr);
-                        ?>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4 col-md-offset-3" id="checkbox">
-                            <input type="checkbox"> Remember Me</label>
-                        </div>
-                        <div class="col-md-4 col-md-offset-3" id="lgoinbtn">
+                        <div class="form-group">
                             <?php
                             $attr = array(
-                                'type' => 'submit',
-                                'class' => 'btn btn-default',
-                                'value' => 'Login'
+                                'type' => 'email',
+                                'class' => 'form-control',
+                                'id' => 'email',
+                            'placeholder' => 'Email Address',
+                                'name' => 'user_email'
                             );
-                            echo form_submit($attr);
+                            echo form_input($attr);
                             ?>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4 col-md-offset-3" id="signup">
-                            <a href= <?php echo base_url().'Register' ?> >SIGN UP</a>
+                        <div class="form-group">
+                            <?php
+                            $attr = array(
+                                'type' => 'password',
+                                'class' => 'form-control',
+                                'id' => 'pass',
+                                'placeholder' => 'Password',
+                                'name' => 'password'
+                            );
+                            echo form_password($attr);
+                            ?>
                         </div>
-                        <div class="col-md-4" id="forgetpass">
-                            <a href= <?php echo base_url().'Login/forget_password' ?> >Forget Password</a>
-                        </div>
+                        <div class="row" id="option-row">
+                            <div class="" id="remmber-me">
+                                <input type="checkbox"> Remember Me</label>
+                            </div>
+                            <div class="" id="login-btn">
+                                <?php
+                                $attr = array(
+                                    'type' => 'submit',
+                                    'class' => 'btn btn-default',
+                                    'value' => 'Login'
+                                );
+                                echo form_submit($attr);
+                                ?>
+                            </div>
                     </div>
-            <?php echo form_close();?>
-        </div>
+                        <div class="row" id="option-row">
+                            <div class="" id="signup">
+                                <a href= <?php echo base_url().'Register' ?> >SIGN UP</a>
+                            </div>
+                            <div class="" id="forget-pass">
+                            <a href="#">Forget Password</a>
+                            </div>
+                        </div>
+                    <?php echo form_close();?>
+            </div>
+		</div>
 
 
 
