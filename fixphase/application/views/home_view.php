@@ -5,6 +5,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 <head>
 	<meta charset="utf-8">
 	<title>Welcome to Home</title>
+    <script src= <?php echo base_url()."assets/lib/jquery/jquery.js" ;?> ></script>
 
 	<style type="text/css">
 

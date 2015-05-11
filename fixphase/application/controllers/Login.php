@@ -90,7 +90,6 @@ class Login extends CI_Controller{
     }
 
     /**
-     * still not sending email there is an issue or i have a slow internet
      * checks if the user exists
      * retrieves the password and send it in an email to the user email address
      * if not do no thing
@@ -114,17 +113,30 @@ class Login extends CI_Controller{
             //valid user
             $this->load->library('email');
 
-            $this->email->from('abdulazizalaa@ymail.com', 'Abdulaziz Alaa');
+            $config['protocol']    = 'smtp';
+            $config['smtp_host']    = 'ssl://smtp.gmail.com';
+            $config['smtp_port']    = '465';
+            $config['smtp_timeout'] = '7';
+            $config['smtp_user']    = 'customers.gonow@gmail.com';
+            $config['smtp_pass']    = 'gonow123';
+            $config['charset']    = 'utf-8';
+            $config['newline']    = "\r\n";
+            $config['mailtype'] = 'text'; // or html
+            $config['validation'] = TRUE; // bool whether to validate email or not
+
+            $this->email->initialize($config);
+            $this->email->set_newline("\r\n");
+            $this->email->from('customers.gonow@gmail.com', 'Abdulaziz Alaa');
             $this->email->to($data['email']);
 
             $this->email->subject('FixPhase - Password');
 
-            $message = 'FixPhase\n';
-            $message .= 'This email is sent upon your request for your password\n ';
-            $message .= 'Your password is: '.$data["password"].' \n ';
-            $message .= 'You can change your password later if you want from inside your account\n';
-            $message .= 'Regards \n';
-            $message .= 'FixPhase Team \n';
+            $message =  "FixPhase \r\n\n" .
+                        "This email is sent upon your request for your password \n\n ".
+                        "Your password is: ".$data['password']." \n ".
+                        "You can change your password later if you want from inside your account \n\n".
+                        "Regards \n".
+                        "FixPhase Team \r\n";
 
             $this->email->message($message);
 
@@ -132,6 +144,7 @@ class Login extends CI_Controller{
                 $this->forget_password('Sent Successfully.');
             }else{
                 $this->forget_password('The Email was not sent due to unexpected error please try again in a while.');
+                echo $this->email->print_debugger();
             }
         }else{
             //invalid user

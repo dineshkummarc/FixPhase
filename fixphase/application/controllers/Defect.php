@@ -117,7 +117,7 @@ class Defect extends Auth_Controller{
                $this->response(array('error' => 1));
           $Defects = $this->defect_model->retrieveAll($id); //Get all defects for project of id = $id
           $Prj_Defects = array();
-          $project;
+          //$project;
           if(!$Defects){ //No defects found, Raise an error
                $project = 404;
           }
