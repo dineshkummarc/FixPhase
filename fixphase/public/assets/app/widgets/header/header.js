@@ -17,27 +17,36 @@ define(
                 //register any DOM events here, like onClick
                 var self = this;
 
-                var userID = content.find('.username').text();
+                var userID = content.find('#username').text();
 
-                var dropDownMenu = content.find('.project-menu');
+                var newProjectForm = content.find('#newProjectForm');
+                var inviteForm = content.find('#inviteForm');
+
+                var dropDownMenu = content.find('#project-menu');
                 var projectElement = content.find('.project-element');
 
-                var addProjectBtn = content.find('.add-project-btn');
-                var addProjectForm = content.find('.addNewProject');
+                var addProjectBtn = content.find('#add-project-btn');
+                var addProjectPopup = content.find('#addNewProject');
 
                 var closeDialog = content.find('.close-dialog');
-                var searchField = content.find('.search-box');
+                var searchField = content.find('#search-box');
 
-                var inviteForm = content.find('.invite');
+                var invitePopup = content.find('#invite');
+                var projectsList = content.find('#project-list');
 
                 var url = "/assets/app/widgets/header/user.json";
 
                 var gotJson = false;
+                invitePopup.dialog({
+                var haveJson = false;
+                var project_open = content.find('#project-open');
+                project_open.click(function(){
+                    if(!haveJson)
+                    {
+                        $.getJSON(url, function (responese) {
+                            haveJson = true;
+                            $.each(responese, function (index, projects) {
 
-                $.getJSON(url, function (responese) {
-                    $.each(responese, function (index, user) {
-                        if(user.username==userID){
-                            $.each(user.projects, function (projectIndex,projectName) {
                                 //create new list item
                                 var project = $('<li/>');
                                 project.prop("class","project-element");
@@ -49,14 +58,15 @@ define(
                                 var invite_btn = $('<button/>',{type:"button" , class:"add-btn"});
 
                                 invite_btn.click(function () {
-                                    inviteForm.dialog("open");
+                                    invitePopup.dialog("open");
+                                    dropDownMenu.slideToggle("fast");
                                 });
 
                                 invite_btn.addClass("btn btn-default");  //new class for styling
                                 invite_btn.text("+");
 
                                 //get project name
-                                var projectN = user.projects[projectIndex].project;
+                                var projectN = projects.pname;
 
                                 //append name of each project to the project link
                                 project_link.text(projectN);
@@ -64,28 +74,42 @@ define(
                                 //append the project link to the list item then append the invite button
                                 project.append(project_link);
                                 project.append(invite_btn);
+                                projectsList.append(project);
+                            })
+                        }).fail(function () {
+                            haveJson = true;
+                            var failRes = $('<li/>');
+                            failRes.prop("class", "fail-msg");
+                            var failTxt = $('<p/>');
 
-                                //append the list item after the search box
-                                $('.project-menu li:eq(1)').after(project);
+                            failRes.hover(function () {
+                                failRes.css("background-color", "#ffb5a4");
                             });
-                        }
-                    });
+
+                            failTxt.text("Failed to fetch data from server.");
+                            failRes.append(failTxt);
+
+                            projectsList.append(failRes);
+                        });
+                    }
                 });
 
-                content.find('.dropdown-toggle').click(function () {
-                    content.find('.project-menu').slideToggle("fast");
-                    content.find('.search-result').hide();
+
+
+                content.find('#projects').click(function () {
+                    dropDownMenu.slideToggle("fast");
                 });
 
 
                 //create new project POPUP
-
+                addProjectPopup.dialog({
 
                 addProjectBtn.click(function () {
-                    addProjectForm.dialog("open");
+                    addProjectPopup.dialog("open");
+                    dropDownMenu.slideToggle("fast");
                 });
 
-                addProjectForm.submit(function (e) {
+                newProjectForm.submit(function (e) {
                     e.preventDefault();
 
                 });
@@ -96,7 +120,7 @@ define(
                     var count = 0;
                     var Exp = new RegExp(filter, "i");
 
-                    content.find(".dropdown-menu .project-element").each(function(){
+                    content.find("#project-list li").each(function(){
 
                         if ($(this).text().search(Exp) < 0) {
                             $(this).fadeOut();
@@ -121,8 +145,47 @@ define(
             start: function () {
                 //access content
                 var content = this.getContent();
-                var inviteForm = content.find('.invite');
-                var addProjectForm = content.find('.addNewProject');
+                var addProjectPopup = content.find('#addNewProject');
+                var invitePopup = content.find('#invite');
+                addProjectPopup.dialog({
+                    autoOpen: false,
+                    show: {
+                        effect: "fade"
+                    },
+                    modal: true,
+                    draggable: false,
+                    fluid: true,
+                    resizable: false,
+                    hide: {
+                        effect: "fade"
+                    },
+                    Close: function () {
+                        $(this).dialog("close");
+                    },
+                    Continue: function () {
+                        $(this).dialog("close");
+                    }
+                });
+
+                invitePopup.dialog({
+                    autoOpen: false,
+                    show: {
+                        effect: "fade"
+                    },
+                    modal: true,
+                    draggable: false,
+                    fluid: true,
+                    resizable: false,
+                    hide: {
+                        effect: "fade"
+                    },
+                    Close: function () {
+                        $(this).dialog("close");
+                    },
+                    Continue: function () {
+                        $(this).dialog("close");
+                    }
+                });
 
                 //invite to project POPUP
                 inviteForm.dialog({
