@@ -51,9 +51,9 @@ class Login extends CI_Controller{
             redirect('Login');
         }
         if($this->session->userdata('logged_in')) {
-            $this->form_validation->set_rules('old_password', 'Old Password','required|min_length[8]|max_length[32]|strtolower');
-            $this->form_validation->set_rules('new_password', 'New Password','required|min_length[8]|max_length[32]|strtolower');
-            $this->form_validation->set_rules('cpassword', 'Confirm Password','required|strtolower|matches[password]');
+            $this->form_validation->set_rules('old_password', 'Old Password','required|min_length[8]|max_length[32]|trim');
+            $this->form_validation->set_rules('new_password', 'New Password','required|min_length[8]|max_length[32]|trim');
+            $this->form_validation->set_rules('cpassword', 'Confirm Password','required|matches[password]');
 
             //if($this->form_validation->run()){
                 if($this->session->userdata('user_id') != null){
@@ -214,7 +214,7 @@ class Login extends CI_Controller{
 
 
             // password validation
-            $this->form_validation->set_rules('password', 'Password', 'required|min_length[4]|max_length[32]');
+            $this->form_validation->set_rules('password', 'Password', 'required|min_length[4]|max_length[32]|trim');
 
 
 
@@ -241,13 +241,13 @@ class Login extends CI_Controller{
 
                 if($this->user_model->isemail($user_email)){ // check if the entered is an email
                     // Validation Rules For Email Field
-                    $this->form_validation->set_rules('user_email', 'Email', 'required|xss_clean|valid_email');
+                    $this->form_validation->set_rules('user_email', 'Email', 'required|xss_clean|valid_email|trim');
                     $isUser_Email_Correct = true;
                     $email = $user_email; // assign input value to var $email
 
                 }else if($this->user_model->isusername($user_email)){ // check if the entered is an username
                     // Validation For Name Field
-                    $this->form_validation->set_rules('user_email', 'Username', 'required|xss_clean|min_length[4]|max_length[32]');
+                    $this->form_validation->set_rules('user_email', 'Username', 'required|xss_clean|min_length[4]|max_length[32]|strtolower');
                     $isUser_Email_Correct = true;
                     $user = $user_email; // assign input value to var $user
                 }else{
