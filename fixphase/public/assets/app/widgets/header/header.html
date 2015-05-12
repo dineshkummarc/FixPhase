@@ -14,43 +14,47 @@
     <script src="header.js"></script>
 </head>
 <body>
-<div class="widget-header">
+<div id="widget-header">
     <nav class="navbar navbar-inverse nav-cont">
         <div class="container-fluid nav-cont">
             <ul class="nav navbar-nav nav-cont">
                 <li class="active logo"><a href="#">Logo</a></li>
-                <li class="dropdown projects"><a class="dropdown-toggle" data-toggle="dropdown" href="#">projects <span class="caret"></span></a>
-                    <ul class="dropdown-menu pre-scrollable project-menu">
+                <li id="project-open" class="dropdown"><a class="dropdown-toggle" id="projects" data-toggle="dropdown" href="#">projects <span class="caret"></span></a>
+                    <ul class="dropdown-menu  " id="project-menu">
                         <li>
-                            <input type="text" class="form-control search-box" placeholder="Search for...">
+                            <input type="text" class="form-control " id="search-box" placeholder="Search for...">
                         </li>
-                        <li class="add-project">
-                            <button type="button" class="btn btn-primary add-project-btn">Add Project</button>
+                        <li id="project-list-cont">
+                            <ul class=" pre-scrollable" id="project-list">
+
+                            </ul>
+                        </li>
+                        <li id="add-project">
+                            <button type="button" class="btn btn-primary " id="add-project-btn">Add Project</button>
                         </li>
                     </ul>
                 </li>
-                <li class="username"><a href="#">Aya Khaled</a></li>
-                </li>
+                <li ><a href="#" id="username">Aya</a></li>
             </ul>
         </div>
     </nav>
-    <div class="addNewProject" id="dialog" title="Add new project">
-        <form class="newProjectForm" novalidate="novalidate">
+    <div id="addNewProject" title="Add new project">
+        <form id="newProjectForm" novalidate="novalidate">
             <div class="form-group">
-                <input type="email" class="form-control proName-input" placeholder="Project name">
+                <input type="text" class="form-control " id="proName-input" placeholder="Project name">
             </div>
             <div class="form-group">
-                <input type="password" class="form-control proDesc-input" placeholder="Description">
+                <input type="text" class="form-control " id="proDesc-input" placeholder="Description">
             </div>
-            <button type="submit" class="btn btn-default submitPro">Submit</button>
+            <button type="submit" class="btn btn-default " id="submitPro">Submit</button>
         </form>
     </div>
-    <div class="invite" title="Invite">
-        <form class="inviteForm" novalidate="novalidate">
+    <div id="invite" title="Invite">
+        <form id="inviteForm" novalidate="novalidate">
             <div class="form-group">
-                <input type="email" class="form-control invite-email" placeholder="Email">
+                <input type="email" class="form-control " id="invite-email" placeholder="Email">
             </div>
-            <button type="submit" class="btn btn-default submit-inv">Invite</button>
+            <button type="submit" class="btn btn-default " id="submit-inv">Invite</button>
         </form>
     </div>
 </div>
