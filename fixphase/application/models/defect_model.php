@@ -35,4 +35,22 @@ class defect_model extends CI_Model{
           $this->db->delete('defect', array('did' => $id));
           return $this->db->affected_rows();
      }
+	 
+	 public function search($severity, $priority, $status){
+		$params = array('severity' => $severity, 'priority' => $priority, 'status' => $status);
+		if(! $severity)
+			unset($params['severity']);
+	    if (! $priority)
+			unset($params['priority']);
+		if (! $status)
+			unset($params['status']);
+		$this->db->where($params);
+		$query = $this->db->get('defect');
+		if($query->num_rows()>0)
+			return $query->result();
+		else 
+			return false;
+		
+	 }
+	 
 }
