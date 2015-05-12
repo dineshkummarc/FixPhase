@@ -270,4 +270,15 @@ class Defect extends Auth_Controller{
                return false;
           }
      }
+	 
+	  public function search_post(){
+		$severity =  $this->post('severity');
+		$priority = $this->post('priority');
+		$status =  $this->post('status');
+		$this ->load ->model("defect_model");
+		$results = $this->defect_model->search($severity, $priority, $status);
+		print_r($results);
+		
+	 
+	}
 }
