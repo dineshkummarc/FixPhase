@@ -1,162 +1,365 @@
-.nav-cont{
-    width: 100%;
-    border-radius: 0px;
+#widget-header{
+    height: 100%;
+
 }
-.logo{
-    float:left;
-    margin-left: 14%;
-    margin-right: 0;
-    width: auto;
-}
-#project-open{
-    float:left;
-    float:left;
-    margin-left: 20%;
-    margin-right: 10%;
-    width: 30%;
+#header-nav{
+    height: 100%;
+    line-height: 50px;
+    font:0/0 a;
+    background-color: #477DD2;
+    border-bottom: 1px solid #e5e5e5;
 }
 
-
-#username{
-    float:left;
-    margin-left: 10%;
-    margin-right: 0;
-    width: auto;
-}
-.search-btn{
-    margin: auto;
-}
-.page-cont{
-    margin: auto;
-}
-#searchResult{
-    background-color: lightgrey;
-    border-radius: 5px;
-}
-::-webkit-scrollbar {
-    width: 12px;
-}
-
-::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
-}
-.pre-scrollable{
-    max-height: 90px;
-    overflow-y: auto;
-    min-height: 20px;
-}
-
-.add-btn{
-    width: 1px;
-    height: 22px;
-    margin-top: 0;
-    margin-bottom: 0;
-    margin-left: 0%;
-    margin-right: -10%;
-    background-color: black;
-    color: white;
-    padding: 1px 15px 5px 7px;
-}
-.add-btn:hover{
-    background-color: #4c4c4c;
-}
-.add-span{
-    padding: 0px;
-    margin: auto;
-    color: white;
-}
-#add-project-btn{
-    width: 95%;
-    margin-top: 5px;
-    margin-left: 2.5%;
-    background-color: black;
-    color: white;
-}
-#add-project-btn:hover{
-    background-color: #4c4c4c;
-}
-#addNewProject #invite{
-    margin: auto;
-    width: 250px;
-    height: 200px;
-    border: 1px solid black;
-    border-radius: 5px;
-}
-#proName-input #invite-email{
-    width: 100%;
-    margin-left: 5%;
-    margin-top: 9.5px;
-}
-#proDesc-input{
-    width: 100%;
-    height: 80px;
-}
-#submitPro #submit-inv{
-    margin-left: 50%;
-    margin-bottom: 5px;
-}
-#project-menu{
-    width: 400px;
-}
-#project-list{
-    width: 100%;
+#header-logo{
     float: left;
-    font-size: 14px;
-    list-style: none;
-    background-color: #fff;
-    margin-left: 0;
+    padding:0 30px;
+    height: 100%;
+    font: 0/0 a;
+}
+#header-logo:hover{
+    cursor: pointer;
+    background-color: #4E8BEC;
+}
+.mid-align:before{
+    content: "";
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
 
+#header-logo img{
+    vertical-align: middle;
+    display: inline-block;
+    height: 30px;
+    width: auto;
 }
-#project-list > li > a {
-    display: inline-table;
-    padding: 3px 20px;
-    clear: both;
-    font-weight: normal;
-    line-height: 1.42857143;
-    color: #333;
-    white-space: nowrap;
-
+#projects-toggle-div{
+    overflow: hidden;
+    height: 100%;
 }
-.project-element{
-    margin-left: -13%;
+.clear-btn{
+    background: none;
+    outline:0;
+    border: none;
 }
-#project-list li a{
-    width: 92%;
-    display: inline-table;
-    padding: 3px 20px;
-    clear: both;
-    font-weight: normal;
-    line-height: 1.42857143;
-    color: #333;
-    white-space: nowrap;
-    text-decoration: none;
-}
-#project-list li{
-    width: 92%;
-}
-#project-list li:hover{
-    background-color: #fbfbfb;
-}
-#project-list-cont{
-    margin-left: 0;
+#projects-toggle-button{
+    display: inline-block;
+    height: 100%;
     width: 100%;
 }
-.fail-msg{
-    width: 600px;
-    background-color: #ffb5a4;
-    border-radius: 5px;
-    border: 1px solid #dd0000;
-    margin-top: 3px ;
-    padding-left: 3px;
-    margin-left: -1%;
+#projects-toggle-button:hover{
+    background-color: #4E8BEC;
 }
-.fail-msg:hover{
-    background-color: #ffb5a4;
-    border: 1px solid #dd0000;
+#projects-toggle-button-active{
+    background-color: #4E8BEC;
+    display: inline-block;
+    height: 100%;
+    width: 100%;
 }
+
+
+
+#projects-toggle-button-title {
+    height: 100%;
+    font-size: 20px;
+    text-align: center;
+    font-family: Arial;
+    font-weight: normal;
+    color:rgb(240, 235, 223);
+}
+#projects-toggle-button-title span{
+    display: inline-block;
+    vertical-align: middle;
+
+
+}
+
+#projects-toggle-button-title .glyphicon{
+    padding-right: 0px;
+    font-size: 25px;
+    top:0px;
+}
+
+
+#projects-dropdown{
+    position: fixed;
+    padding:0;
+}
+
+#projects-list-container{
+    min-height: 100px;
+}
+#search-box{
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+#header-right-container{
+    float: right;
+    padding: 0 30px;
+    font: 0/0 a;
+    height: 100%;
+    color:rgb(240, 235, 223);
+
+}
+
+.nav-item{
+    height: 100%;
+    display: inline-block;
+    font-size: 18px;
+    margin-right: 5px ;
+    min-width: 50px;
+    text-align:center;
+    color: rgba(240, 235, 223,0.4);
+
+}
+
+.nav-item span{
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.nav-item:hover{
+    color: rgb(240, 235, 223);
+    cursor: pointer;
+}
+#user-container{
+    font-size: 14px;
+    font-weight: bold;
+    margin-right: 35px;
+    color: rgb(240, 235, 223);
+}
+#user-container:hover{
+    cursor: default;
+}
+#user-container img{
+    display: inline-block;
+    vertical-align: middle;
+    width: 25px;
+    height: 25px;
+    margin-right: 8px;
+}
+
+
+#notification-toggle-button{
+    font-size: 20px;
+    display: inline-block;
+    height: 100%;
+}
+
+.badge-notify{
+    position:relative;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .7);
+    border-radius: 2px;
+    background: #dc0d17 linear-gradient(#fa3c45, #dc0d17);
+    color: #fff;
+    padding: 1px 3px;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, .4);
+    top:-8px;
+    left:-8px;
+
+}
+#project-add{
+    font-weight: normal;
+}
+
+.project-element{
+    height: 45px;
+    font-size: 18px;
+    width: 100%;
+    padding: 5px 20px;
+}
+
+.project-element:hover{
+    cursor: pointer;
+    background-color: #4E8BEC;
+    color: rgb(240, 235, 223);
+}
+.project-element .project-name{
+    display: inline-block;
+    height: 100%;
+    float:left;
+}
+
+.project-element .invite-button{
+    display: inline-block;
+    height: 100%;
+    float: right;
+
+}
+.project-element .invite-button span{
+    vertical-align: middle;
+    font-size:14px;
+}
+
+#project-list{
+    max-height: 150px;
+    overflow-y: auto;
+    list-style-type:none;
+}
+
+
+
+
+/*.nav-cont{*/
+    /*width: 100%;*/
+    /*border-radius: 0px;*/
+/*}*/
+/*.logo{*/
+    /*float:left;*/
+    /*margin-left: 10px;*/
+    /*margin-right: 0;*/
+    /*width: auto;*/
+/*}*/
+/*#project-open{*/
+    /*float:left;*/
+    /*float:left;*/
+    /*margin-left: 20%;*/
+    /*margin-right: 10%;*/
+    /*width: 30%;*/
+/*}*/
+
+
+/*#username{*/
+    /*float:left;*/
+    /*margin-left: 10%;*/
+    /*margin-right: 0;*/
+    /*width: auto;*/
+/*}*/
+/*.search-btn{*/
+    /*margin: auto;*/
+/*}*/
+/*.page-cont{*/
+    /*margin: auto;*/
+/*}*/
+/*#searchResult{*/
+    /*background-color: lightgrey;*/
+    /*border-radius: 5px;*/
+/*}*/
+/*::-webkit-scrollbar {*/
+    /*width: 12px;*/
+/*}*/
+
+/*::-webkit-scrollbar-track {*/
+    /*-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);*/
+    /*border-radius: 10px;*/
+/*}*/
+
+/*::-webkit-scrollbar-thumb {*/
+    /*border-radius: 10px;*/
+    /*-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);*/
+/*}*/
+/*.pre-scrollable{*/
+    /*max-height: 90px;*/
+    /*overflow-y: auto;*/
+    /*min-height: 20px;*/
+/*}*/
+
+/*.add-btn{*/
+    /*width: 1px;*/
+    /*height: 22px;*/
+    /*margin-top: 0;*/
+    /*margin-bottom: 0;*/
+    /*margin-left: 0%;*/
+    /*margin-right: -10%;*/
+    /*background-color: black;*/
+    /*color: white;*/
+    /*padding: 1px 15px 5px 7px;*/
+/*}*/
+/*.add-btn:hover{*/
+    /*background-color: #4c4c4c;*/
+/*}*/
+/*.add-span{*/
+    /*padding: 0px;*/
+    /*margin: auto;*/
+    /*color: white;*/
+/*}*/
+/*#add-project-btn{*/
+    /*width: 95%;*/
+    /*margin-top: 5px;*/
+    /*margin-left: 2.5%;*/
+    /*background-color: black;*/
+    /*color: white;*/
+/*}*/
+/*#add-project-btn:hover{*/
+    /*background-color: #4c4c4c;*/
+/*}*/
+/*#addNewProject #invite{*/
+    /*margin: auto;*/
+    /*width: 250px;*/
+    /*height: 200px;*/
+    /*border: 1px solid black;*/
+    /*border-radius: 5px;*/
+/*}*/
+/*#proName-input #invite-email{*/
+    /*width: 100%;*/
+    /*margin-left: 5%;*/
+    /*margin-top: 9.5px;*/
+/*}*/
+/*#proDesc-input{*/
+    /*width: 100%;*/
+    /*height: 80px;*/
+/*}*/
+/*#submitPro #submit-inv{*/
+    /*margin-left: 50%;*/
+    /*margin-bottom: 5px;*/
+/*}*/
+/*#project-menu{*/
+    /*width: 400px;*/
+/*}*/
+/*#project-list{*/
+    /*width: 100%;*/
+    /*float: left;*/
+    /*font-size: 14px;*/
+    /*list-style: none;*/
+    /*background-color: #fff;*/
+    /*margin-left: 0;*/
+
+/*}*/
+/*#project-list > li > a {*/
+    /*display: inline-table;*/
+    /*padding: 3px 20px;*/
+    /*clear: both;*/
+    /*font-weight: normal;*/
+    /*line-height: 1.42857143;*/
+    /*color: #333;*/
+    /*white-space: nowrap;*/
+
+/*}*/
+/*.project-element{*/
+    /*margin-left: -13%;*/
+/*}*/
+/*#project-list li a{*/
+    /*width: 92%;*/
+    /*display: inline-table;*/
+    /*padding: 3px 20px;*/
+    /*clear: both;*/
+    /*font-weight: normal;*/
+    /*line-height: 1.42857143;*/
+    /*color: #333;*/
+    /*white-space: nowrap;*/
+    /*text-decoration: none;*/
+/*}*/
+/*#project-list li{*/
+    /*width: 92%;*/
+/*}*/
+/*#project-list li:hover{*/
+    /*background-color: #fbfbfb;*/
+/*}*/
+/*#project-list-cont{*/
+    /*margin-left: 0;*/
+    /*width: 100%;*/
+/*}*/
+/*.fail-msg{*/
+    /*width: 600px;*/
+    /*background-color: #ffb5a4;*/
+    /*border-radius: 5px;*/
+    /*border: 1px solid #dd0000;*/
+    /*margin-top: 3px ;*/
+    /*padding-left: 3px;*/
+    /*margin-left: -1%;*/
+/*}*/
+/*.fail-msg:hover{*/
+    /*background-color: #ffb5a4;*/
+    /*border: 1px solid #dd0000;*/
+/*}*/
