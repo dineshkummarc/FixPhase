@@ -1,62 +1,77 @@
 <!DOCTYPE html>
 <html>
-<head lang="en">
-    <meta charset="utf-8">
-    <title>Header</title>
-
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
-    <link rel="stylesheet" href="header.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-    <link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
-    <script src="header.js"></script>
-</head>
 <body>
-<div id="widget-header">
-    <nav class="navbar navbar-inverse nav-cont">
-        <div class="container-fluid nav-cont">
-            <ul class="nav navbar-nav nav-cont">
-                <li class="active logo"><a href="#">Logo</a></li>
-                <li id="project-open" class="dropdown"><a class="dropdown-toggle" id="projects" data-toggle="dropdown" href="#">projects <span class="caret"></span></a>
-                    <ul class="dropdown-menu  " id="project-menu">
-                        <li>
-                            <input type="text" class="form-control " id="search-box" placeholder="Search for...">
-                        </li>
-                        <li id="project-list-cont">
-                            <ul class=" pre-scrollable" id="project-list">
+    <div id="widget-header">
+        <nav id="header-nav" >
+            <div id="header-logo" class="mid-align">
+                <img src="/assets/images/logo2.png">
+            </div>
 
-                            </ul>
-                        </li>
-                        <li id="add-project">
-                            <button type="button" class="btn btn-primary " id="add-project-btn">Add Project</button>
-                        </li>
-                    </ul>
-                </li>
-                <li ><a href="#" id="username">Aya</a></li>
-            </ul>
+            <div id="header-right-container" class="mid-align">
+                <div id="user-container" class="nav-item mid-align">
+                  <img src="/assets/images/empty.jpg"><span>Karim Tarabishy</span>
+                </div>
+                <div id="project-add" class="nav-item mid-align"
+                     data-toggle="tooltip" data-placement="bottom" title="Add project">
+                    <span class="glyphicon glyphicon-plus" ></span>
+                </div>
+
+                <div id="notification" class="nav-item mid-align dropdown"
+                     data-toggle="tooltip" data-placement="bottom" title="Notifications">
+                    <span class="glyphicon glyphicon-globe" ></span><!--
+                                --><span class="badge badge-notify">3</span>
+                </div>
+
+                <div id="logout" class="nav-item mid-align"
+                     data-toggle="tooltip" data-placement="bottom" title="Logout">
+                    <span class="glyphicon glyphicon-log-out" ></span>
+                </div>
+            </div>
+
+            <div id="projects-toggle-div" class="dropdown">
+                <button id="projects-toggle-button" class="dropdown-toggle clear-btn"
+                           data-toggle="dropdown" >
+                    <div id="projects-toggle-button-title" class="mid-align">
+                        <span style="padding-right: 3px">Projects</span>
+                        <span class="caret"></span>
+                    </div>
+                </button>
+
+                <ul class="dropdown-menu" id="projects-dropdown">
+                    <li>
+                        <input type="text" class="form-control" id="search-box" placeholder="Search for...">
+                    </li>
+                    <li id="projects-list-container">
+                        <ul class="pre-scrollable" id="project-list">
+
+                        </ul>
+                    </li>
+                </ul>
+
+            </div>
+
+
+
+        </nav>
+        <div id="addNewProject" title="Add new project">
+            <form id="newProjectForm" novalidate="novalidate">
+                <div class="form-group">
+                    <input type="text" class="form-control " id="proName-input" placeholder="Project name">
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control " id="proDesc-input" placeholder="Description">
+                </div>
+                <button type="button" class="btn btn-default " id="submitPro">Submit</button>
+            </form>
         </div>
-    </nav>
-    <div id="addNewProject" title="Add new project">
-        <form id="newProjectForm" novalidate="novalidate">
-            <div class="form-group">
-                <input type="text" class="form-control " id="proName-input" placeholder="Project name">
-            </div>
-            <div class="form-group">
-                <input type="text" class="form-control " id="proDesc-input" placeholder="Description">
-            </div>
-            <button type="submit" class="btn btn-default " id="submitPro">Submit</button>
-        </form>
+        <div id="invite" title="Invite">
+            <form id="inviteForm" novalidate="novalidate">
+                <div class="form-group">
+                    <input type="email" class="form-control " id="invite-email" placeholder="Email">
+                </div>
+                <button type="button" class="btn btn-default " id="submit-inv">Invite</button>
+            </form>
+        </div>
     </div>
-    <div id="invite" title="Invite">
-        <form id="inviteForm" novalidate="novalidate">
-            <div class="form-group">
-                <input type="email" class="form-control " id="invite-email" placeholder="Email">
-            </div>
-            <button type="submit" class="btn btn-default " id="submit-inv">Invite</button>
-        </form>
-    </div>
-</div>
 </body>
 </html>
