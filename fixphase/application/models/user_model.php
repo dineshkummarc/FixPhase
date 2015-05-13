@@ -55,6 +55,20 @@ class user_model extends CI_Model{
         }
     }
 
+    /**
+     * @author: Abdulaziz Mohamed Alaa
+     */
+    public function get_user_name($user_id){
+        $this->db->select('full_name');
+        $this->db->where('user_id',$user_id);
+        $query = $this->db->get('users');
+        if($query->num_rows() > 0){
+            return $query->row();
+        }else{
+            return false;
+        }
+    }
+
 
     //get user password
     /**
@@ -196,6 +210,14 @@ class user_model extends CI_Model{
         return $data;
     }
 
+    /**
+     * @author: Abdulaziz Mohamed Alaa
+     */
+    public function user_exists($user_id){
+        $this->db->where('user_id', $user_id);
+        $query = $this->db->get('users');
+        return ($query->num_rows() > 0 )?true:false;
+    }
 
     //<============Moataz============>
     /**
