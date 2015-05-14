@@ -62,7 +62,7 @@ class Defect extends Auth_Controller{
      }
      public function index_put(){
          $defect = $this->put('defect');
-          if(! $this->authorized($defect['user_id'], $this->get_project_of($defect['did']))
+          if(! $this->authorized($defect['user_id'], $this->get_project_of($defect['did'])))
                $this->response(array('error' => array('id' => 1)));
           $this->load->model('defect_model');
           $data = array(
@@ -110,7 +110,7 @@ class Defect extends Auth_Controller{
                $this->response(array('error' => 2));
           }
           else{
-               if(!$this->authorized($data['user_id']), $data['pid'])
+               if(!$this->authorized($data['user_id'], $data['pid']))
                     $this->response(array('error' => array('id' => 1)));
                $comment = array(
                     'project_id' => $data['pid'],
@@ -128,7 +128,7 @@ class Defect extends Auth_Controller{
                $this->response(array('error' => 2));
           }
           else{
-          if(!$this->authorized($data['user_id']), $data['pid'])
+          if(!$this->authorized($data['user_id'], $data['pid']))
                $this->response(array('error' => array('id' => 1)));
           $comment =  array(
                'project_id' => $data['pid'],
@@ -260,7 +260,7 @@ class Defect extends Auth_Controller{
                }
           }
      }
-     public function project_exists($id){
+     protected function project_exists($id){
           $this->load->model("project_model");
           if($this->project_model->project_exists($id)){
                return true;
@@ -270,15 +270,12 @@ class Defect extends Auth_Controller{
                return false;
           }
      }
-	 
-	  public function search_post(){
-		$severity =  $this->post('severity');
-		$priority = $this->post('priority');
-		$status =  $this->post('status');
+	  public function search_get(){
+		$severity =  $this->get('severity');
+		$priority = $this->get('priority');
+		$status =  $this->get('status');
 		$this ->load ->model("defect_model");
 		$results = $this->defect_model->search($severity, $priority, $status);
-		print_r($results);
-		
-	 
+		$this->response($results);
 	}
 }
