@@ -118,7 +118,7 @@ function(Observer, core, Component, Store){
 
                 //exit stores
                 for(var i in _usedStores){
-                    _usedStores[i].exit();
+                    _usedStores[i].exit(this);
                 }
 
                 return true;

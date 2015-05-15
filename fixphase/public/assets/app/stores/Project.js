@@ -1,11 +1,17 @@
-define(["store"], function(Store){
+define(["store", "stores/User"], function(Store, User){
+
 
     var projects = null;
+    var cur_project= null;
 
     // store object
     return new Store({
-        //ajaxMethod property holds all methods that will do ajax requests
-        //ajax methods should be named according to properties in config/api
+        //access by this.properties.PROJECTS which represent the id that is needed to observe changes on projects.
+        properties: [
+            "PROJECTS",
+            "CUR_PROJECT"
+        ],
+
         ajaxMethods:{
             /**
              * Get all projects
@@ -14,25 +20,11 @@ define(["store"], function(Store){
              * @param {object}  data         - query arguments to be sent in request (maybe null)
              * @param {boolean} disableCache - Set to true to disable cache and force reload from server.
              *
-             * @return {Object} - a promise object.
-             *
-             * Usage:
-             *                     getProjects(caller,data).done(donefunc).fail(failfunc)
-             *
-             * Done & Fail functions:
-             *     - done func:
-             *                 info -> called when ajax request succeeded and server response is back
-             *                 arguments ->  success  : indicated whether the server responded with an error
-             *                               data     : holds the error object, if success is false, otherwise, holds
-             *                                         the data requested
-             *     - fail func:
-             *                info -> this is called when the ajax request fails and didnt reach server
-             *                arguments ->  errorStatus : "timeout" , "" ....
+             * the success return is an array of project objects {id: {}, id:{}}
              */
             getProjects: function (id, caller, data, disableCache) {
-                disableCache = !!disableCache;
-                //if we already have projects and no disableCache return a resolved promise
-                if(projects && !disableCache)
+                //if we already have projects
+                if(projects)
                 {
                     return this.makeResolvedPromise(caller, true, projects)
                 }
@@ -42,88 +34,169 @@ define(["store"], function(Store){
                     id: id,                      // function identifier
                     caller: caller,              // object calling this function
                     data: data,                  // query to be sent to server,
-                    disableCache: disableCache,  // indicate force reload
-                    /**
-                     * Track the cache of this request so as to ignore recently finished requests if the cache already
-                     * has a value. A function is used to make a closure that tracks the cache object.
-                     * @returns {Object} - project cache
-                     */
-                    cache: function () {
-                        return projects;
-                    },
                     /**
                      * This is called to filter the passed data argument to the callback of the promise returned,
                      * when the promise has done.
                      *
-                     * @param {boolean} cahceRequest   - Indicate if this is a request that should get the cache
                      * @param {boolean} success        - indicate whether the data argument is an error object or not
-                     * @param {object}  data           - holds data returned from server (either error object or
+                     * @param {object}  returnedData   - holds data returned from server (either error object or
                      *                                   actual data)
                      * @return {Object}                - argument passed to done promise callbacks as the data argument
                      */
-                    filterDoneArguments: function (cacheRequest, success, data) {
+                    filterDoneArguments: function (success, returnedData) {
                         // if error from server return error msg
                         if(!success)
                         {
-                            return data;
-                        }
-                        // check if we this is a new get request not a cache
-                        if(!cacheRequest)
-                        {
-                            projects = data;
-                        }
-                        return projects;
-                    },
+                            if(returnedData.id == Store.prototype.Errors.USER_ID_TAMPERED){
+                                return "We dont server hackers."
+                            }
 
-                    /**
-                     * This is called to filter the passed errormsg argument to the callback of the promise returned,
-                     * when the promise has failed
-                     *
-                     * @param   {object} jqXHR     - jquery XHR object
-                     * @param   {string} statusMsg - holds data returned from server (either error msg or actual data)
-                     * @returns {string}           - argument passed to failed promise callbacks as the data argument
-                     */
-                    filterFailedArguments: function (jqXHR, statusMsg) {
-                        return statusMsg;
+                            return "Uknown error of id " + data.id;
+                        }
+
+                        projects = returnedData;
+                        this.fireChange(this.properties.PROJECTS, true, {type:"change",data:projects}, caller);
+                        return projects;
                     }
+                });
+            },
+
+            getProject: function (id, caller, data, disableCache) {
+                //otherwise fetch result from server
+                return this.get({
+                    id: id,                      // function identifier
+                    caller: caller,              // object calling this function
+                    data: data,                  // query to be sent to server,
+                    /**
+                     * This is called to filter the passed data argument to the callback of the promise returned,
+                     * when the promise has done.
+                     *
+                     * @param {boolean} success        - indicate whether the data argument is an error object or not
+                     * @param {object}  returnedData   - holds data returned from server (either error object or
+                     *                                   actual data)
+                     * @return {Object}                - argument passed to done promise callbacks as the data argument
+                     */
+                    filterDoneArguments: function (success, returnedData) {
+                        // if error from server return error msg
+                        if(!success)
+                        {
+                            if(returnedData.id == Store.prototype.Errors.UNAUTHORIZED ||
+                                returnedData.id == Store.prototype.Errors.NOT_FOUND){
+                                return null;
+                            }
+
+                            return "Uknown error of id " + data.id;
+                        }
+
+                        return returnedData;
+                    }
+                });
+            },
+
+            createProject: function (id, caller, data) {
+                return this.set({
+                    id: id,
+                    caller: caller,
+                    data: data,
+                    method: "POST",
+
+                    filterDoneArguments: function (success, returnedData) {
+                        //if failed to create
+                        if(!success)
+                        {
+                            return "Uknown error of id " + data.id;
+                        }
+                        //create new project
+                        var project = {id: returnedData, owner: data.user_id, name: data.name};
+                        //check if we have a projects list
+                        if(projects)
+                        {
+                            projects.push(project);
+                            this.fireChange(this.properties.PROJECTS, true, {type: "add", data: project}, null);
+                        }
+                        //return the data
+                        return project;
+                    }
+
+
+                });
+            },
+
+            inviteToProject: function (id, caller, data) {
+                return this.set({
+                    id: id,
+                    caller: caller,
+                    data: data,
+                    method: "POST",
+
+                    filterDoneArguments: function (success, returnedData) {
+                        //if failed to create
+                        if(!success)
+                        {
+                            //data is the error msg
+                            if(returnedData.id == Store.prototype.Errors.NOT_FOUND){
+                                return "No user found with such email."
+                            }
+
+                            return "Uknown error of id " + data.id;
+                        }
+                        return null;
+                    }
+
+
                 });
             }
         },
 
-        createProject: function (id, caller, data) {
-            return this.set({
-                id: id,
-                caller: caller,
-                data: data,
-                method: "PUT",
-
-                filterDoneArguments: function (success, data) {
-                    //if failed to create
-                    if(!success)
-                    {
-                        return data;
-                    }
-                    //if succeeded then check if we already fetched todos
-                    if(projects)
-                    {
-                        //if so update it with the new item
-                        projects.push(data);
-                    }
-                    //return the data
-                    return data;
-                }
-
-
-            });
-        },
 
         //on setup
         setup: function () {
             this.observeURL(/project\/.+/, function (url, urlPath, args) {
                 //if we have projects
+                //if we have the projects get it from them
+                if(cur_project)
+                {
+                    if(cur_project.id == args.id)
+                        return;
+                }
                 if(projects)
                 {
+                    if(!projects[args.id]){
 
+                        this.fireChange(this.properties.CUR_PROJECT, false, {_empty:true}, null);
+                        this.goToURL("/notfound");
+                    }
+                    else
+                    {
+                        cur_project = projects[args.id];
+                        this.fireChange(this.properties.CUR_PROJECT, true,cur_project , null);
+                    }
+                }
+                else
+                {
+                    //get user id
+                    User.getUser()
+                        .done(function (success, data) {
+                            //get project
+                            this.getProject(this, {user_id:data.user_id, pid:args.id})
+                                .done(function (success, data) {
+                                    //we reached server but we got an error so go to notfound
+                                    if(!success)
+                                    {
+                                        this.fireChange(this.properties.CUR_PROJECT, false, {_empty:true}, null);
+                                        this.goToURL("/notfound");
+                                        return;
+                                    }
+                                    cur_project = data;
+                                    this.fireChange(this.properties.CUR_PROJECT, true,cur_project , null);
+                                })
+                                .fail(function () {
+                                    this.fireChange(this.properties.CUR_PROJECT, false, null, null);
+                                });
+                        })
+                        .fail(function(){
+                            this.fireChange(this.properties.CUR_PROJECT, false, null, null);
+                        });
                 }
             });
         },

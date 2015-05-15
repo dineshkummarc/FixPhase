@@ -1,6 +1,9 @@
-define(["jquery", "observer", "identity", "core", "promise","api", "reloader"],
-function ($, observer, Identity, core, Promise, rest, api, store, reloader) {
+define(["jquery", "observer", "identity", "core", "promise","api"],
+function ($, observer, Identity, core, Promise, rest, api, store) {
 
+    var stubIdentity = {getId: function () {
+        return -1;
+    }};
     /**
      * Used In the begining of a new get request to check if the completed request promise should have its
      * callbacks called or not.
@@ -10,23 +13,14 @@ function ($, observer, Identity, core, Promise, rest, api, store, reloader) {
      * @param {Object}   caller          - Object calling the function
      * @param {Object}   requestInstance - An instance of the current request object
      * @param {int}      requestedTime   - The time of this request
-     * @param {boolean} isModifyRequest  - Indicate if this is not a get request it is (SET,PUT or DELETE)
      */
-    var shouldAcceptRequest = function(store, activeCalls, id, caller, requestInstance, requestedTime,
-                                       isModifyRequest)
+    var shouldCallCallbacks = function(store, activeCalls, id, caller, requestInstance, requestedTime)
     {
         // check if another request was made before this one finish
         if(requestInstance.time > requestedTime)
         {
             // just ignore this call and dont remove anything, entry will be used by next request
             return false;
-        }
-
-        //if not a modify request then deal with the reloader
-        if(!isModifyRequest)
-        {
-            // I am the last request from this caller so remove anything in reload because i will handle my response now
-            reloader.removeFromReload(store, id, caller);
         }
 
         // check if this request was cancelled, this means that the caller last in active is greater than the
@@ -45,9 +39,9 @@ function ($, observer, Identity, core, Promise, rest, api, store, reloader) {
 
 
     /**
-     *
-     * @param options
-     * @param activeCalls
+     * Setup a request
+     * @param options  - cotains opptions of this request
+     * @param activeCalls - list of all store active calls
      * @returns {Object} - setup data
      */
     var setupRequest = function (options, activeCalls) {
@@ -112,6 +106,9 @@ function ($, observer, Identity, core, Promise, rest, api, store, reloader) {
      * a correspondig property of the same name in config/api that gives the url used by this ajax method.
      * @param {Object} data - Holds the object methods as follows
      * {
+     *      properties: [
+     *          name
+     *      ],
      *      ajaxMethods: {
      *
      *          methodname: function (id, caller, data){},
@@ -138,12 +135,16 @@ function ($, observer, Identity, core, Promise, rest, api, store, reloader) {
             _local,
             _ajax,
             _activeCalls,
-            _lastInActive
+            _lastInActive,
+            _changeEventListeners,
+            _listenersWatchedProperties
         ;
         _active = false;
         _setupFunc = function () {};
         _exitFunc = function () {};
         _lastInActive = 0;
+        _changeEventListeners = {};
+        _listenersWatchedProperties = {}
         /*
          * Saves active calls for this store
          * {
@@ -185,6 +186,13 @@ function ($, observer, Identity, core, Promise, rest, api, store, reloader) {
                     this[funcname] = createFunc(data,funcname);
                 }
             }
+            //add properties
+            if(data.properties instanceof Array){
+                this.properties = {};
+                for(var i in data.properties){
+                    this.properties[data.properties[i]] = i;
+                }
+            }
         }
 
         //--- Explicit methods ---//
@@ -218,19 +226,36 @@ function ($, observer, Identity, core, Promise, rest, api, store, reloader) {
 
         /**
          * Called when exiting the store
+         * @param {object} listener - An identifier object that used to listen to some change event on this store
          * @returns {boolean}
          */
-        this.exit = function () {
+        this.exit = function (listener) {
             //if already exit skip
             if(!this.isActive())
             {
                 return false;
             }
 
-            //if exit called but this needed in next view then skip
+            //check if exit called but this needed in next view
             if(core.isInNextView(this))
             {
-               return false;
+                //check if we have a listener
+                if(listener instanceof Identity)
+                {
+                    //remove all its listen callbacks
+                    var properties = _listenersWatchedProperties[listener.getId()];
+                    if(properties)
+                    {
+                        for(var i in properties){
+                            this.unregisterEvent(listener, properties[i]);
+                        }
+                    }
+                    _listenersWatchedProperties[listener.getId()] = undefined;
+
+                }
+
+                //then skip
+                return false;
             }
 
             _active = false;
@@ -238,6 +263,10 @@ function ($, observer, Identity, core, Promise, rest, api, store, reloader) {
 
             //remove all observe events
             this.unobserveAll();
+
+            //reset change event listeners
+            _changeEventListeners = {};
+            _listenersWatchedProperties = {};
 
             _exitFunc.call(this);
             return true;
@@ -290,8 +319,8 @@ function ($, observer, Identity, core, Promise, rest, api, store, reloader) {
             })
                 .done(function (data) {
                     // check if we should accept this request
-                    if (!shouldAcceptRequest(this, _activeCalls, options.id, options.caller,
-                            setup.requestInstance, setup.requestedTime, false)) {
+                    if (!shouldCallCallbacks(this, _activeCalls, options.id, options.caller,
+                            setup.requestInstance, setup.requestedTime)) {
                         return;
                     }
 
@@ -301,28 +330,20 @@ function ($, observer, Identity, core, Promise, rest, api, store, reloader) {
                     // and assume it succeeded
                     var success = true;
 
-                    var cacheRequest = true;
-                    //check if we shouldnot use cache
-                    if(options.disableCache || !options.cache())
+                    //now check if this is an error
+                    if(data.error)
                     {
-                        cacheRequest = false;
-                        if(data.error)
-                        {
-                            // make returned data the error obj and make success false
-                            success = false;
-                            returnedData = data.error;
-                        }
+                        // make returned data the error obj and make success false
+                        success = false;
+                        returnedData = data.error;
                     }
-                    else if(!options.disableCache && options.cache()){ // use cache
-                        returnedData = options.cache();
-                        success = true;
-                    }
+
 
                     // now pass to filter if exist
                     if(options.filterDoneArguments)
                     {
                         // get filter result and make it our new returned data
-                        returnedData = options.filterDoneArguments(success, returnedData, cacheRequest);
+                        returnedData = options.filterDoneArguments(success, returnedData);
                     }
 
                     // now resolve the promise object to call its callbacks passing a filter
@@ -331,36 +352,14 @@ function ($, observer, Identity, core, Promise, rest, api, store, reloader) {
                         f.call(options.caller,success,returnedData);
                     });
 
-                    //resolve all others requests as me
-                    reloader.resolveRequest(this, options.id, success, returnedData);
 
                 })
                 .fail(function (jqXHR, statusMsg) {
                     // check if we should accept this request
-                    if(!shouldAcceptRequest(this, _activeCalls, options.id, options.caller,
-                            setup.requestInstance, setup.requestedTime, false)) {
+                    if(!shouldCallCallbacks(this, _activeCalls, options.id, options.caller,
+                            setup.requestInstance, setup.requestedTime)) {
                         return;
                     }
-
-                    //check if we should use cache
-                    var cacheRequest = false;
-                    if(!options.disableCache && options.cache())
-                    {
-                        cacheRequest = true;
-                        returnedData = options.cache();
-                        // now pass to filter if exist
-                        if(options.filterDoneArguments)
-                        {
-                            // get filter result and make it our new returned data
-                            returnedData = options.filterDoneArguments(true, returnedData, cacheRequest);
-                        }
-
-                        setup.requestInstance.promise.setDone(function (f) {
-                            f.call(options.caller,true,returnedData);
-                        });
-                        return;
-                    }
-
                     // otherwise we should accept it so start handle the response
                     var returnedData = statusMsg;
 
@@ -371,14 +370,11 @@ function ($, observer, Identity, core, Promise, rest, api, store, reloader) {
                         returnedData = options.filterFailedArguments(jqXHR, returnedData)
                     }
 
-                    // now simulate the failed promise object to call its callbacks passing a filter
+                    // now set failed promise object to call its callbacks passing a filter
                     // to set the correct context and arguments of callbacks
-                    setup.requestInstance.promise.simulateFailed(function (f) {
+                    setup.requestInstance.promise.setFailed(function (f) {
                         f.call(options.caller,returnedData);
                     });
-
-                    //add this request to the need to reload
-                    reloader.addToReload(this, options.id, options.caller, requestInstance);
 
                 });
             return setup.promise;
@@ -404,8 +400,8 @@ function ($, observer, Identity, core, Promise, rest, api, store, reloader) {
             })
                 .done(function (data) {
                     // check if we should accept this request
-                    if (!shouldAcceptRequest(this, _activeCalls, options.id, options.caller,
-                            setup.requestInstance, setup.requestedTime, true)) {
+                    if (!shouldCallCallbacks(this, _activeCalls, options.id, options.caller,
+                            setup.requestInstance, setup.requestedTime)) {
                         return;
                     }
 
@@ -438,8 +434,8 @@ function ($, observer, Identity, core, Promise, rest, api, store, reloader) {
                 })
                 .fail(function (jqXHR, statusMsg) {
                     // check if we should accept this request
-                    if(!shouldAcceptRequest(this, _activeCalls, options.id, options.caller,
-                            setup.requestInstance, setup.requestedTime, true)) {
+                    if(!shouldCallCallbacks(this, _activeCalls, options.id, options.caller,
+                            setup.requestInstance, setup.requestedTime)) {
                         return;
                     }
 
@@ -463,10 +459,131 @@ function ($, observer, Identity, core, Promise, rest, api, store, reloader) {
             return setup.promise;
         };
 
+        /**
+         *
+         * @param {number} property_id - id of the property being changed
+         * @param {Object} listener - An identifier object that is calling this store function to observer some changes
+         * @param {function} callback - function to call when event fires
+         * callback has this signature function(failed, data)
+         *        -- failed: indicate whether the store was able to fetch and change the property correctly
+         *        -- data: holds an error object {id:id, msg:msg} if failed other wise hold the new value
+         * @returns {boolean}
+         */
+        this.onChange = function (property_id, listener, callback) {
+            // if callback was not defined or if the listener dont hav identity, then, skip register
+            if(callback === null || !(listener instanceof Identity))
+                return false;
+            callback = function () {
+                callback.apply(listener, Array.prototype.slice.call(arguments))
+            };
+            //check if given event already exists
+            var event = _changeEventListeners[property_id];
+            if(event !== undefined)
+            {
+                //check if this object already have a callback in this event
+                if(event.callbacks[listener.getId()] === undefined) {
+                    //it is a new listener so lets increment listerners count
+                    event.listenersCount++;
+                }
+                event.callbacks[listener.getId()] = callback;
+
+            }
+            else// event doesnt exist
+            {
+                //create a callbacks object for the new event
+                var callbacks = {};
+                //add object's callback to it
+                callbacks[listener.getId()] = callback;
+                //add the event
+                var event = {listenersCount: 1, callbacks:callbacks};
+
+                _changeEventListeners[listener.getId()] = event;
+
+            }
+            //save for fast access on delete
+            if(!_listenersWatchedProperties[listener.getId()])
+            {
+                _listenersWatchedProperties[listener.getId()] = [];
+            }
+            _listenersWatchedProperties[listener.getId()].push(property_id);
+
+            return true;
+        };
+
+        /**
+         * Used to unregister object callback from an event.
+         * @param {Object} listener - An identifier object that was observing a change
+         * @param {number} property_id - The regex object to unregister
+         */
+        this.unregisterEvent = function (listener, property_id) {
+            if(!(listener instanceof Identity))
+                return false;
+
+            //check if event exist
+            var event = _changeEventListeners[property_id];
+            if(event !== undefined)
+            {
+                //check if the given object have a callback in this event
+                if(event.callbacks[listener.getId()] !== undefined)
+                {
+                    //remove  callback
+                    event.callbacks[listener.getId()] = undefined;
+                    //decrement callbacks size
+                    event.listenersCount--;
+
+                    //check if event callbacks are empty
+                    if(event.listenersCount == 0)
+                    {
+                        //remove the whole event
+                        _changeEventListeners[property_id] = undefined;
+                    }
+                }
+            }
+
+            return true;
+        };
+
+        /**
+         * Used to fire a change event
+         * @param {number} property_id - The regex object to unregister
+         * @param {boolean} failed - indicate whether the change was successful or not
+         * @param {object} data  - Holds the new value or an error object {id:id,msg:msg}
+         * @param {?object} execluded  - Dont fire for given listener
+         */
+        this.fireChange = function (property_id,failed, data, execluded) {
+            if(!(execluded instanceof Identity)){
+               execluded = stubIdentity;
+            }
+            for(var event_key in _changeEventListeners)
+            {
+                //check if this event has listeners
+                var event = _changeEventListeners[event_key];
+                if(event !== undefined)
+                {
+                    //loop over all listeners and call their callbacks
+                    for(var listener_id in event.callbacks){
+                        var callback = event.callbacks[listener_id];
+                        if(callback !== undefined && listener_id != execluded.getId())
+                        {
+                            callback(failed, data);
+                        }
+                    }
+                }
+            }
+        }
+
     };
 
 
     Store.prototype = new Identity();
+
+    Store.prototype.Errors = {
+        UNAUTHORIZED: 1,
+        INVALID_INPUT:2,
+        NOT_FOUND: 3,
+        USER_ID_TAMPERED: 4
+    };
+
 
 
 });

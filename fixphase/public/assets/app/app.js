@@ -30,7 +30,6 @@ requirejs.config({
         widget: "../lib/core/widget",
         store: "../lib/core/store",
         promise: "../lib/core/promise",
-        reloader: "../lib/core/reloader"
 
     }
 });

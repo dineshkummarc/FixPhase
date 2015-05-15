@@ -86,9 +86,6 @@
     padding:0;
 }
 
-#projects-list-container{
-    min-height: 100px;
-}
 #search-box{
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;

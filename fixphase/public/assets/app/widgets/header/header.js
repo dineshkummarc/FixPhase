@@ -3,14 +3,16 @@ define(
         "text!widgets/header/header.html!strip",
         "widget",
         'jquery',
+        "stores/Project",
         "css!widgets/header/header.css",
         "css!smoothness",
         "jquery-ui/dialog"
     ],
-    function (html, Widget, $) {
+    function (html, Widget, $, Project) {
 
         return new Widget({
 
+            usedStores: [],
             //a must have property where content are setup
             makeContent: function () {
                 var content = $(($.parseHTML($.trim(html)))[0]);
@@ -34,6 +36,9 @@ define(
                 var inviteSubmit = content.find("#submit-inv");
                 var projectsList = content.find('#project-list');
 
+                var projectTitle = content.find('#project-current');
+                var error = $("<li/>", {id: "error-cont"});
+
                 var url = "/assets/app/widgets/header/user.json";
 
                 var logout= content.find("#logout");
@@ -44,9 +49,16 @@ define(
                 projectToggleButton.click(function(){
                     if(!haveJson)
                     {
-                        $.getJSON(url, function (responese) {
+                        response.detach();
+                        Project.getProjects().done(function (success, response) {
+                            if(!success)
+                            {
+                                projectsList.append(response);
+                                return;
+                            }
+                            response.detach();
                             haveJson = true;
-                            $.each(responese, function (index, projects) {
+                            $.each(response, function (id, project) {
 
                                 //create new list item
                                 var project = $('<li/>');
@@ -58,7 +70,7 @@ define(
                                     //execute if we didnt click the invite button
                                     if(!obj.hasClass("invite-button") && !obj.parent().hasClass("invite-button"))
                                     {
-                                        self.goToURL("/project/"+projects.id);
+                                        self.goToURL("/project/"+project.id);
                                     }
 
                                 });
@@ -72,15 +84,15 @@ define(
 
                                 invite_btn.append($('<span/>', {class:"glyphicon glyphicon-send"}));
                                 invite_btn.click(function (ev) {
-                                    inviteSubmit.text("Invite to " + projects.name);
-                                    inviteSubmit.attr("data", projects.id);
+                                    inviteSubmit.text("Invite to " + project.name);
+                                    inviteSubmit.attr("data", project.id);
                                     invitePopup.dialog("open");
 
                                 });
 
 
                                 //get project name
-                                var projectN = projects.name;
+                                var projectN = project.name;
 
                                 //append name of each project to the project link
                                 project_link.text(projectN);
