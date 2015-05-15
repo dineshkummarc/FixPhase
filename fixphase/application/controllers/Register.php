@@ -66,7 +66,7 @@ class Register extends CI_Controller{
               $this->load->view('Register_view',$this->session->userdata('fields'));
           }
       }else{
-          redirect('Home');
+          redirect('/');
       }
   }
 
