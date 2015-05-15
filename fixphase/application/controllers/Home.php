@@ -27,8 +27,4 @@ class Home extends Auth_Controller{
         //PUT requests
         echo "put";
     }
-    public function index()
-    {
-        $this->load->view('home_view');
-    }
 }

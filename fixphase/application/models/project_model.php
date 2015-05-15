@@ -12,7 +12,13 @@ class project_model extends CI_Model{
         );
 
         if($this->db->insert('project', $data) > 0){
-            return $this->db->insert_id();
+            $project_id = $this->db->insert_id();
+            if($this->insert_contributor($user_id, $project_id, -1))
+            {
+                return $project_id;
+            }else{
+                return false;
+            }
         }else{
             return false;
         }
@@ -23,7 +29,8 @@ class project_model extends CI_Model{
     //offset $offset
     //limit $limit
     public function get_all_user_projects($user_id, $offset, $limit){
-        $this->db->select('project.project_id, project.project_name, project.created_by as owner, users.username, contributor.role, contributor.date_assigned');
+        //$this->db->select('project.project_id as id, project.project_name as name, project.created_by as owner, users.username, contributor.role, contributor.date_assigned');
+        $this->db->select('project.project_id as id, project.project_name as name, project.created_by as owner');
         $this->db->from('project');
         $this->db->join('contributor', 'contributor.project_assigned = project.project_id');
         $this->db->join('users', 'users.user_id = project.created_by');
@@ -41,7 +48,7 @@ class project_model extends CI_Model{
     //offset $offset
     //limit $limit
     public function get_all_projects($offset, $limit){
-        $this->db->select('project_id, project_name, created_by as owner');
+        $this->db->select('project_id as id, project_name as name, created_by as owner');
         $query = $this->db->get("project", $offset, $limit);
         if($query->num_rows() > 0){
             return $query->result();
@@ -53,7 +60,19 @@ class project_model extends CI_Model{
     //get the data of a specific project with project_id = $id
     public function get_project($project_id){
         //leave until the database is updated with new attributes for the project data
-        //$this->db->select('project_id, project_name');
+        $this->db->select('project_id as id, project_name as name, created_by as owner');
+        $this->db->where('project_id', $project_id);
+        $query = $this->db->get("project");
+        if($query->num_rows() > 0){
+            return $query->row();
+        }else{
+            return false;
+        }
+    }
+
+    //get the data of a specific project with project_id = $id
+    public function get_project_info($project_id){
+        //leave until the database is updated with new attributes for the project data
         $this->db->where('project_id', $project_id);
         $query = $this->db->get("project");
         if($query->num_rows() > 0){
@@ -126,11 +145,7 @@ class project_model extends CI_Model{
         if($this->is_contributor($user_id, $project_id)){
             return true;
         }else{
-            if($this->is_owner($user_id, $project_id)){
-                return true;
-            }else{
-                return false;
-            }
+            return false;
         }
     }
 

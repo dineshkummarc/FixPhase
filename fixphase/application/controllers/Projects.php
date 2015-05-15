@@ -3,7 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 require_once APPPATH.'/libraries/Auth_Controller.php';
 
-class Project extends Auth_Controller{
+class Projects extends Auth_Controller{
 
     public function index(){
         echo "index";
@@ -14,7 +14,7 @@ class Project extends Auth_Controller{
         //use this to insure that the request is coming from an ajax call not from a browser
         //if($this->input->is_ajax_request()){
         if($this->get('pid') == null){
-            $this->get_all_projects();
+            $this->get_all_user_projects();
         }else{
             //request to get data about a specific project with the project id
             $this->get_project($this->get('pid'));
@@ -39,14 +39,18 @@ class Project extends Auth_Controller{
         }
     }
 
-    public function contributor_put(){
+    public function statistics_get(){
+        if($this->get('pid') != null){
+            $this->get_project_statistics($this->get('pid'));
+        }
+    }
+
+    public function contributor_post(){
         $this->insert_contributor();
     }
 
     public function insert_contributor(){
 
-        //$this->load->model('project_model');
-        //$this->project_model->insert_contributor('515166','1', '1');
         $user_id = $this->put('user_id');
         $project_id = $this->put('pid');
         $email = $this->put('email');
@@ -57,7 +61,7 @@ class Project extends Auth_Controller{
         $json = new stdClass();
         $json->data = new stdClass();
 
-        if($user_id != null && $project_id != null && $email != null && $role != null && $this->user_model->user_exists($user_id) && $user_id == $this->session->userdata('user_id')){
+        if($user_id != null && $project_id != null && $email != null && $role != null && $this->user_model->user_exists($user_id)){
             $contributor_id = $this->user_model->get_user_by_email($email);
             if($contributor_id){
                 $contributor_id = $contributor_id[0]->user_id;
@@ -100,7 +104,8 @@ class Project extends Auth_Controller{
                             $this->email->message($message);
 
                             if($this->email->send()){
-                                $json->data->project_id = $result;
+                                //$json->data->project_id = $result;
+                                $json->data = new stdClass();
                             }else{
                                 $json->data->error = new stdClass();
                                 $json->data->error->id = '2';
@@ -142,7 +147,7 @@ class Project extends Auth_Controller{
         $json = new stdClass();
         $json->data = new stdClass();
 
-        if($user_id != null && $project_name != null && $project_summary != null && $this->user_model->user_exists($user_id) && $user_id == $this->session->userdata('user_id')){
+        if($user_id != null && $project_name != null && $project_summary != null && $this->user_model->user_exists($user_id)){
             $this->load->model('project_model');
             $result = $this->project_model->insert_project($project_name, $project_summary, $user_id);
             if($result){
@@ -163,19 +168,10 @@ class Project extends Auth_Controller{
 
     public function get_project_summary($project_id){
         //request to get a specific project summary with the project id
-        /*
-        {
-            "data":
-            {
-                ‘summary’ : ‘ ’
-            },
-            "error":{"id":""}
-        }
-        */
         $this->load->model('project_model');
         $data = $this->project_model->get_project($project_id);
         if($data){
-            if($this->get('user_id') == $this->session->userdata('user_id') && $this->project_model->has_auth($this->get('user_id'), $project_id)){
+            if($this->project_model->has_auth($this->get('user_id'), $project_id)){
 
                 $json = array(
                     'data' => array(
@@ -185,7 +181,6 @@ class Project extends Auth_Controller{
             }else{
                 //unauthorized
                 $json = array(
-                    'data' => '',
                     'error' => array(
                         'id' => '1'
                     )
@@ -194,25 +189,21 @@ class Project extends Auth_Controller{
             $this->response($json);
         }else{
             //not found
-            $this->response('',404);
-        }
+
+            $json = array(
+                'error' => array(
+                    'id' => '3'
+                )
+            );
+            $this->response($json);        }
     }
 
     public function get_project_contributors($project_id){
         //request to get a specific project contributors with the project id
-        /*
-        {
-            "data":
-            {
-                ‘contributors’ : [ { ‘username’ : ‘ ‘, ‘id’ : ‘ ’ } ]
-            },
-            "error":{"id":""}
-        }
-        */
         $this->load->model('project_model');
         $data = $this->project_model->get_project($project_id);
         if($data){
-            if($this->get('user_id') == $this->session->userdata('user_id') && $this->project_model->has_auth($this->get('user_id'), $project_id)){
+            if($this->project_model->has_auth($this->get('user_id'), $project_id)){
 
                 $json = array(
                     'data' => array(
@@ -222,7 +213,6 @@ class Project extends Auth_Controller{
             }else{
                 //unauthorized
                 $json = array(
-                    'data' => '',
                     'error' => array(
                         'id' => '1'
                     )
@@ -231,37 +221,88 @@ class Project extends Auth_Controller{
             $this->response($json);
         }else{
             //not found
-            $this->response('',404);
-        }
+
+            $json = array(
+                'data' => array()
+            );
+            $this->response($json);        }
+    }
+
+    public function get_project_statistics($project_id){
+        //request to get data about a specific project with the project id
+        $this->load->model('project_model');
+        $data = $this->project_model->get_project($project_id);
+        if($data){
+            if($this->project_model->has_auth($this->get('user_id'), $project_id)){
+                $statistics = new stdClass();
+                $statistics->total_bugs = $this->project_model->get_bugs_count($project_id, '');
+                $statistics->opened_bugs = $this->project_model->get_bugs_count($project_id, 'opened');
+                $statistics->assigned_bugs = $this->project_model->get_bugs_count($project_id, 'assigned');
+                $statistics->solved_bugs = $this->project_model->get_bugs_count($project_id, 'solved');
+                $statistics->closed_bugs = $this->project_model->get_bugs_count($project_id, 'closed');
+
+                $json = array(
+                    'data' => array(
+                        'statistics' => $statistics
+                    )
+                );
+            }else{
+                //unauthorized
+                $json = array(
+                    'error' => array(
+                        'id' => '1'
+                    )
+                );
+            }
+            $this->response($json);
+        }else{
+            //not found
+
+            $json = array(
+                'error' => array(
+                    'id' => '3'
+                )
+            );
+            $this->response($json);        }
     }
 
     public function get_project($project_id){
         //request to get data about a specific project with the project id
-        /*
-        {
-            "data":
-            {
+        $this->load->model('project_model');
+        //======================================================
+        $data = $this->project_model->get_project($project_id);
+        if($data){
+            if($this->project_model->has_auth($this->get('user_id'), $project_id)){
 
-                ‘summary’ : ‘ ’,
-                ‘owner’: ‘’,
-                ‘contributors’ : [ { ‘username’ : ‘ ‘, ‘id’ : ‘ ’ } ],
-                ‘statistics’ :
-                {
-                    ‘total_bugs’ : ‘ ‘,
-                    ‘opened_bugs’ : ‘ ‘,
-                    ‘assigned_bugs’ : ‘ ‘,
-                    ‘solved_bugs’ : ‘ ‘,
-                    ‘closed_bugs’ : ‘ ‘
-                }
+                $json = array(
+                    'data' => ''
+                );
+            }else{
+                //unauthorized
+                $json = array(
+                    'error' => array(
+                        'id' => '1'
+                    )
+                );
+            }
+            $this->response($json);
+        }else{
+            //not found
 
-            },
-            "error":{"id":""}
-        }
-        */
+            $json = array(
+                'error' => array(
+                    'id' => '3'
+                )
+            );
+            $this->response($json);        }
+    }
+
+    public function get_project_info($project_id){
+        //request to get data about a specific project with the project id
         $this->load->model('project_model');
         $data = $this->project_model->get_project($project_id);
         if($data){
-            if($this->get('user_id') == $this->session->userdata('user_id') && $this->project_model->has_auth($this->get('user_id'), $project_id)){
+            if($this->project_model->has_auth($this->get('user_id'), $project_id)){
                 $statistics = new stdClass();
                 $statistics->total_bugs = $this->project_model->get_bugs_count($project_id, '');
                 $statistics->opened_bugs = $this->project_model->get_bugs_count($project_id, 'opened');
@@ -280,7 +321,6 @@ class Project extends Auth_Controller{
             }else{
                 //unauthorized
                 $json = array(
-                    'data' => '',
                     'error' => array(
                         'id' => '1'
                     )
@@ -289,87 +329,59 @@ class Project extends Auth_Controller{
             $this->response($json);
         }else{
             //not found
-            $this->response('',404);
-        }
+
+            $json = array(
+                'error' => array(
+                    'id' => '3'
+                )
+            );
+            $this->response($json);        }
     }
 
     public function get_all_user_projects(){
         //request to get all the projects in the database related to specific user
         //will return ids and names and owner id only
-        /*
-        {
-          "data":
-            {
-                [
-                  {"project_id":"1","project_name":"game", created_by:'515166'},
-                  {"project_id":"2","project_name":"hayyy", created_by:'515166'}
-                ]
-            },
-          "error":{"id":""}
-        }
-        */
         $this->load->model('project_model');
         $data = $this->project_model->get_all_user_projects($this->session->userdata('user_id'), 0, 500);
         if($data){
-            if($this->get('user_id') == $this->session->userdata('user_id')){
+            $json = new stdClass();
+            $json->data = new stdClass();
 
-                $json = array(
-                    'data' => $data
-                );
-
-            }else{
-                //unauthorized
-                $json = array(
-                    'data' => '',
-                    'error' => array(
-                        'id' => '1'
-                    )
-                );
+            foreach($data as $proj){
+                $id = $proj->id;
+                $json->data->$id = $proj;
             }
             $this->response($json);
         }else{
             //not found
-            $this->response('',404);
-        }
+
+            $json = array(
+                'data' => array()
+            );
+            $this->response($json);        }
     }
 
     public function get_all_projects(){
         //request to get all the projects in the database
         //will return ids and names and owner id only
-        /*
-            {
-              "data":
-                {
-                    [
-                      {"project_id":"1","project_name":"game", created_by:'515166'},
-                      {"project_id":"2","project_name":"hayyy", created_by:'515166'}
-                    ]
-                },
-              "error":{"message":""}
-            }
-        */
         $this->load->model('project_model');
         $data = $this->project_model->get_all_projects(0, 500);
         if($data){
-            if($this->get('user_id') == $this->session->userdata('user_id')){
+            $json = new stdClass();
+            $json->data = new stdClass();
 
-                $json = array(
-                    'data' => $data
-                );
-            }else{
-                //unauthorized
-                $json = array(
-                    'data' => '',
-                    'error' => array(
-                        'id' => '1'
-                    )
-                );
+            foreach($data as $proj){
+                $id = $proj->id;
+                $json->data->$id = $proj;
             }
 
             $this->response($json);
         }else{
             //not found
-            $this->response('',404);
+            $json = array(
+                'data' => array()
+            );
+            $this->response($json);
         }
 
 

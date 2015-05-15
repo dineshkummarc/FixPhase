@@ -3,28 +3,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Login extends CI_Controller{
 
-
-    //<===========WORK==========>
-    //this controller still lacks two functions
-    //==>Forget Password
-    //the user forget his/her password
-    //so he enters his email then an email is sent to him
-    //containing username - email - password
-    //and a link to the change password form
-    //==>change password
-    //you have to make a view for the change password
-    //you go this view from inside the home view
-    //you can get the userid from the session
-    //and then the form contains the following fields
-    //old password - new password - confirm new password
-    //you have to check that the old password is true
-    //if true updated to the new password
-    //<===========WORK==========>
-
     public function index($msg = null){
         if($this->session->userdata('logged_in')){ // Moataz: This variable check whether you are validated or not
             //header("Location: ".base_url()."Home");// what is this for ?? asked By Moataz
-            redirect('Home');
+            redirect('/');
         }else{
             // Make it load the default login form in case he isn't logged in
             $data['msg']=$msg;
@@ -186,7 +168,7 @@ class Login extends CI_Controller{
 
 
                 //logging check complete you can redirect to whatever you want
-                redirect('Home');// go to home view
+                redirect('/');// go to home view
             }else{
                 //invalid user
                 $this->session->set_userdata('logged_in',false);
@@ -197,7 +179,7 @@ class Login extends CI_Controller{
 
         }else{
             //already logged in redirect to home page
-            redirect('Home');
+            redirect('/');
         }
     }
 
@@ -274,7 +256,7 @@ class Login extends CI_Controller{
                 $this->index("Wrong user/pass");
             }
         }else{
-            redirect('Home');
+            redirect('/');
         }
     }
 
@@ -286,14 +268,5 @@ class Login extends CI_Controller{
         $this->session->sess_destroy();
         redirect('login');
     }
-
-
-    //<===========WORK==========>
-    //Unit testing
-    //you have to make a function that calls your function with several
-    //inputs to varify it is working probably
-    //and print the error message if present
-    //<===========WORK==========>
-
 
 }
