@@ -10,6 +10,8 @@ class Defect extends Auth_Controller{
           $this->response->format = 'json';
      }
      public function index_get($did = "index"){
+          $this->load->model("defect_model");
+          $this->defect_model->unit_tests(); die;
           if($did == 'index' && !$this->get('pid') && !$this->get('did'))
                $this->load->view("errors/no_defect");
           else if(is_numeric($did)){
@@ -275,6 +277,8 @@ class Defect extends Auth_Controller{
 		$priority = $this->get('priority');
 		$status =  $this->get('status');
 		$this ->load ->model("defect_model");
+		if(!$severity && !$priority && !$status)
+		     $this->response('', 404);
 		$results = $this->defect_model->search($severity, $priority, $status);
 		$this->response($results);
 	}

@@ -24,7 +24,10 @@ class defect_model extends CI_Model{
      public function get_project($id){
           $this->db->where(array('defect_id' => $id));
           $result = $this->db->get('defect');
-          return $result->result()[0]->related_project_id;
+          if($result->num_rows() == 1)
+               return (int) $result->result()[0]->related_project_id;
+          else
+               return false;
      }
      public function update($data, $where){
           $this->db->where(array('defect_id' => $where));
@@ -35,22 +38,31 @@ class defect_model extends CI_Model{
           $this->db->delete('defect', array('did' => $id));
           return $this->db->affected_rows();
      }
-	 
-	 public function search($severity, $priority, $status){
-		$params = array('severity' => $severity, 'priority' => $priority, 'status' => $status);
-		if(! $severity)
-			unset($params['severity']);
-	    if (! $priority)
-			unset($params['priority']);
-		if (! $status)
-			unset($params['status']);
-		$this->db->where($params);
-		$query = $this->db->get('defect');
-		if($query->num_rows()>0)
-			return $query->result();
-		else 
-			return false;
-		
-	 }
-	 
+     public function search($severity, $priority, $status){
+          $params = array('severity' => $severity, 'priority' => $priority, 'status' => $status);
+          if(! $severity)
+               unset($params['severity']);
+          if (! $priority)
+               unset($params['priority']);
+          if (! $status)
+               unset($params['status']);
+          $this->db->where($params);
+          $query = $this->db->get('defect');
+          if($query->num_rows()>0)
+               return $query->result();
+          else
+               return false;
+
+     }
+     public function unit_tests(){
+          $this->load->library('unit_test');
+          $this->unit->run($this->retrieveAll(2), 'is_array', 'Retrieve all defects of a given project');
+          $this->unit->run($this->retrieveAll(912), false, 'Retrieve all defects of a given project');
+          $this->unit->run($this->retrieve(1), 'is_object', 'Retrieve a certain defect');
+          $this->unit->run($this->retrieve(502), false, 'Retrieve a certain defect');
+          $this->unit->run($this->get_project(2), 'is_int', 'Retrieve project ID of a defect');
+          $this->unit->run($this->get_project(333), false, 'Retrieve project ID of a defect');
+          echo $this->unit->report();
+     }
+
 }
