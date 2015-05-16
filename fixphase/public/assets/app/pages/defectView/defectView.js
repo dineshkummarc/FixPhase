@@ -7,61 +7,46 @@ define(
     ],
     function (html, Page, $) {
         var editFlag = false;
-        var commentCount = 1;
-        function addComment() {
-            $("#comments #comments-section #"+commentCount+"").html('<p id="commentator">Ali Korayem</p><p id="commentText">'+commentCount+'</p>');
-            $("#comments #comments-section #"+commentCount+"").html('<br>');
-            $("#comments #comments-section #"+commentCount+"").html('<div id="'+(commentCount++)+'"></div>');
-        }
+        
         return new Page({
 
             //a must have property where content are setup
             makeContent: function () {
                 var content = $(($.parseHTML($.trim(html)))[0]);
-
+				
                 //save this variable to use it in events callback
                 var self = this;
                 //register any DOM events here, like onClick
-                content.find("#buttonset").click(function () {
+                content.find("#defectView-page-edit").click(function () {
 					
+					
+					var generatedHTML;
 					var titleVal;
+					var releaseNameVal;
+					var releaseVersionVal;
 					var descVal;
-					var projectVal;
-					var versionVal;
+					var severityVal;
+					var priorityVal;
+					var productVal;
+					
 					if(!editFlag)
 					{
 						editFlag = true;
-						titleVal = content.find('#title p').text();
-						descVal = content.find('#desc p').text();
-						projectVal = content.find('#project p').text();
-						versionVal = content.find('#version p').text();
-
-						content.find('#desc').html("<div id='edesc'><textarea>"+descVal+"</textarea></div>");
-						content.find('#title').html("<div id='etitle'><input type='text' value="+titleVal+"></div>");
-						content.find('#project').html("<div id='eproject'><input type='text' value="+projectVal+"></div>");
-						content.find('#version').html("<div id='eversion'><input type='text' value="+versionVal+"></div>");
-
-
-						content.find('#buttonset').html("<button onclick='editDesc()'>Save</button>");
-
+						titleVal = content.find('#title td').text();
+						releaseNameVal = content.find("#release-name td").text();
+						releaseVersionVal = content.find("#release-version td").text();
+						descVal = content.find('#defectView-page-descriptionText').text();
+						content.find("#defectView-page-descriptionText").html("<div id='edit-fieldDiv'><textarea id='edit-field' style='height:300px; resize:none;' class='form-control' rows='3'>"+descVal+"</textarea></div>");
+						content.find("#defectView-page-edit").html("<div id='defectView-page-save'><button type='button' id='defectView-page-editbutton' class='btn btn-xs btn-success'><span class='glyphicon glyphicon-ok'></span></button></div>");
 					}
 					else {
 						editFlag = false;
-						descVal = content.find('#edesc textarea').val();
-						titleVal = content.find('#etitle input').val();
-						projectVal = content.find('#eproject input').val();
-						versionVal = content.find('#eversion input').val();
-
-						content.find('#edesc').html("<div id='desc'><p>"+descVal+"</p></div>");
-						content.find('#etitle').html("<div id='title'><p>"+titleVal+"</p></div>");
-						content.find('#eproject').html("<div id='project'><p>"+projectVal+"</p></div>");
-						content.find('#eversion').html("<div id='version'><p>"+versionVal+"</p></div>");
-
-						content.find('#buttonset').html("<button onclick='editDesc()'>Edit Defect</button>");
-
+						content.find("#edit-fieldDiv").html("<div id='defectView-page-descriptionText'>"+content.find("#edit-field").val()+"</div>");
+						content.find("#defectView-page-save").html("<div id='defectView-page-edit'><button type='button' id='defectView-page-editbutton' class='btn btn-xs btn-primary'><span class='glyphicon glyphicon-pencil'></span></button></div>");
 					}
 					
                 });
+					
 
 
                 return content;
