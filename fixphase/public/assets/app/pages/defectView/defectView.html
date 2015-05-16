@@ -6,23 +6,85 @@
 	
 <body>
 	<div id="defectView-page-div">
-		<div id="defectBody">
-			<div id="title"><p>Project Summary Broken</p></div>
-			<div id='project'><p>TheUltimateProject</p></div>
-			<div id='version'><p>1.0</p></div>
-			<div id='desc'><p>In the subscribe page, returning to Project Summary page returns a 404</p></div>	
-			<div id='buttonset'><button onclick="editDesc()">Edit Defect</button></div>
-		</div>
-		<div id="comments">
-			<div id="comment-input">
-				<textarea></textarea>
-				<br>
-				<button onclick="addComment()">Post</button>
+		
+		<div class="container">
+			<div class="row" id="defectView-page-title">
+				<h3>#<span id="did">defectID</span>-<span id="project-title">Project Title</span></h3>
+			
 			</div>
-			<div id="comments-section">
-				<div id="1"></div>
+			<div class="row">
+			
+				<div id="defectView-page-description" class="col-xs-7 pin">
+					
+					<div id="defectView-page-descriptionText">This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.This is some text for the description of the defect. You can edit it dynamically bla bla bla bla.</div>
+					<div id="defectView-page-edit"><button type="button" class="btn btn-xs btn-primary"><span id="defectView-page-editButton" class="glyphicon glyphicon-pencil"></span></button></div>
+				
+				</div>
+				
+				<div class="col-xs-3 pin pull-right">
+				
+						<table class="table" id="defectView-page-defectTable">
+						  <tr>
+							<th>Headline/Summary</th>
+							   <td id="title">Some Title</td>
+						  </tr>
+						  <tr>
+							<th>Release Name</th>
+							<td id="release-name">Easy</td>
+						  </tr>
+						  <tr>
+							<th>Release Version</th>
+							<td id="release-version">1.0</td>
+						  </tr>
+						  <tr>
+							<th>Severity</th>
+							<td id="severity">Major</td>
+						  </tr>
+						  <tr>
+							<th>Priority</th>
+							<td id="priority">High</td>
+						  </tr>
+						  <tr>
+							<th>Product</th>
+							<td id="product">El bta3 el gamed</td>
+						  </tr>
+						</table>
+
+				</div>
+
 			</div>
+	
+			<div id="defectView-page-commentSection">
+				<div class="row">
+				
+					<div class="col-md-6">
+						
+						<textarea id="comment-field"></textarea><button type="button" class="btn btn-lg btn-success"><span class="glyphicon glyphicon-comment"></span></button>
+					</div>
+				</div>
+				<div class="row">	
+					<div class="commentcard" id="1">
+						<div class="pin">
+							<p class="defectView-page-commentator-name"><span class="glyphicon glyphicon-user"></span>Abdulaziz</p>
+							<p class="defectView-page-commentator-comment">Lorem ipsum dolor sit amet.</p>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="commentcard" id="2">
+						<div class="pin">
+							<p class="defectView-page-commentator-name"><span class="glyphicon glyphicon-user"></span>Omar</p>
+							<p class="defectView-page-commentator-comment">Fusce sagittis fringilla augue.</p>
+						</div>
+					</div>
+				</div>
+				
+			
+		
 		</div>
+			
+		</div>
+			
 	</div>
 </body>
 

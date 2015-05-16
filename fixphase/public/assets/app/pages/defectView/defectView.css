@@ -1,0 +1,140 @@
+#defectView-page-div{
+	overflow-y:scroll; 
+    position:relative;
+
+}
+
+.pin {
+    display: inline-block;
+    background: #FEFEFE;
+    border: 2px solid #FAFAFA;
+    box-shadow: 0 1px 2px rgba(34, 25, 25, 0.4);
+    margin: 0 2px 15px;
+    -webkit-column-break-inside: avoid;
+    -moz-column-break-inside: avoid;
+    column-break-inside: avoid;
+    padding: 15px 15px 5px;
+    background: #FFFFFF;
+    opacity: 1;
+    border-radius: 4px;
+
+    -webkit-transition: all .2s ease;
+    -moz-transition: all .2s ease;
+    -o-transition: all .2s ease;
+    transition: all .2s ease;
+}
+
+.pin img {
+    width: 100%;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 15px;
+    margin-bottom: 5px;
+}
+
+
+
+.container {
+	
+	overflow-y: scroll;
+	position: relative;
+	
+}
+
+.pin p {
+    font: 12px/18px Arial, sans-serif;
+/*
+    color: #333;
+*/
+    margin: 0;
+}
+
+.col-xs-8 pin {
+	/*display: inline-block;*/
+    background: #FEFEFE;
+    border: 2px solid #FAFAFA;
+    box-shadow: 0 1px 2px rgba(34, 25, 25, 0.4);
+    margin: 0 2px 15px;
+    -webkit-column-break-inside: avoid;
+    -moz-column-break-inside: avoid;
+    column-break-inside: avoid;
+    padding: 15px 15px 5px;
+    background: #FFFFFF;
+    opacity: 1;
+	height: 600px;
+    border-radius: 4px;
+
+    -webkit-transition: all .2s ease;
+    -moz-transition: all .2s ease;
+    -o-transition: all .2s ease;
+    transition: all .2s ease;
+}
+
+
+
+.col-xs-8 pin p {
+    font: 12px/18px Arial, sans-serif;
+
+    color: #333;
+
+    margin: 0;
+}
+
+#comment-field {
+	
+	width: 600px;
+	resize: none;
+	
+}
+.commentcard .pin{
+	
+	display: inline-block;
+    border: 1px solid #454545;
+    box-shadow: 0 1px 2px rgba(34, 25, 25, 0.4);
+    margin: 0 2px 15px;
+    -webkit-column-break-inside: avoid;
+    -moz-column-break-inside: avoid;
+    column-break-inside: avoid;
+    padding: 15px 15px 5px;
+    background: #FFFFFF;
+    opacity: 1;
+    border-radius: 4px;
+	min-width: 500px;
+    -webkit-transition: all .2s ease;
+    -moz-transition: all .2s ease;
+    -o-transition: all .2s ease;
+    transition: all .2s ease;
+	background: #d6d6d6;
+	opacity: 1;
+	padding: 0;
+	
+}
+
+.commentcard .defectView-page-commentator-name {
+	
+	font-size: 18px;
+	font-weight: bold;
+	
+}
+
+.commentcard .defectView-page-commentator-comment {
+	color: #777;
+	
+}
+
+#defectView-page-description {
+
+	min-height: 350px;
+	max-height: 350px;
+	overflow-y: scroll;
+	border: 1px solid #454545;
+	
+}
+
+#defectView-page-defectTable{
+	
+	min-height: 300px;
+	max-height: 300px;
+	
+}
+
+
