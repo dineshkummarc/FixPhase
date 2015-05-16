@@ -3,7 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 require_once APPPATH.'/libraries/Auth_Controller.php';
 
-class Defect extends Auth_Controller{
+class Defects extends Auth_Controller{
 
      public function __construct(){
           parent::__construct();
