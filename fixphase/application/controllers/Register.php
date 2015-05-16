@@ -42,7 +42,6 @@ class Register extends CI_Controller{
                   'role'=> strtolower($this->input->post('role')),
                   'full_name'=> $fname . " " . $lname
               );
-                print_r($data); die;
               if($this->user_model->insert_user($data)){
                   redirect('login');
                   //$this->session->set_userdata($data);
