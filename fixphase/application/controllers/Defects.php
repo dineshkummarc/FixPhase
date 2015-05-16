@@ -20,7 +20,7 @@ class Defects extends Auth_Controller{
      public function index_post(){
           $defect = $this->post('defect');
           if(! $this->authorized($defect['user_id'], $defect['project_id']))
-               $this->response(array('error' => array('id' => 1)));
+               $this->response(array('error' => array('id' => 1, 'message' => 'Unauthorized access')));
           $this->load->model('defect_model');
           $data = array(
                          'title' => $defect['title'],
@@ -37,24 +37,24 @@ class Defects extends Auth_Controller{
           if(is_numeric($status))
                $this->response('',200);
           else
-               $this->response('', 404);
+               $this->response(array('error' => array('id' => -1, 'message' => 'An unknown error has occured')));
      }
 
      public function index_delete(){
           $data = $this->delete('defect');
           if(! $this->authorized($defect['user_id'], $this->get_project_of($defect['did'])))
-               $this->response(array('error' => array('id' => 1)));
+               $this->response(array('error' => array('id' => 1, 'message' => 'Unauthorized access')));
           $this->load->model('defect_model');
           $status = $this->defect_model->delete($data['did']);
           if($status == 1)
                $this->response('', 200);
           else
-               $this->response('', 404);
+               $this->response(array('error' => array('id' => -1, 'message' => 'An unknown error has occured')));
      }
      public function index_put(){
          $defect = $this->put('defect');
           if(! $this->authorized($defect['user_id'], $this->get_project_of($defect['did'])))
-               $this->response(array('error' => array('id' => 1)));
+               $this->response(array('error' => array('id' => 1, 'message' => 'Unauthorized access')));
           $this->load->model('defect_model');
           $data = array(
                          'title' => $defect['title'],
@@ -74,7 +74,7 @@ class Defects extends Auth_Controller{
           if($status == 1)
                $this->response('',200);
           else
-               $this->response('', 404);
+               $this->response(array('error' => array('id' => -1, 'message'=> 'An unknown error has occured')));
      }
      public function comment_get(){
           $did = $this->get('did');
@@ -84,15 +84,15 @@ class Defects extends Auth_Controller{
                $result = $this->comments->retrieve_defect_comments($did);
                if($result){
                     if(!$this->authorized($user_id, $this->get_project_of($did)))
-                         $this->response(array('error' => array('id' => 1)));
+                         $this->response(array('error' => array('id' => 1, 'message' => 'Unauthorized access')));
                     else
                          $this->response($result);
                }
                else
-                    $this->response('',404);
+                    $this->response(array('error' => array('id' => 3, 'message' => 'The requested comment was not found')));
           }
           else
-               $this->response('',404);
+               $this->response(array('error' => array('id' => -1, 'An unknown error has occured')));
      }
      public function comment_post(){
           $this->load->model('comments');
@@ -102,7 +102,7 @@ class Defects extends Auth_Controller{
           }
           else{
                if(!$this->authorized($data['user_id'], $data['pid']))
-                    $this->response(array('error' => array('id' => 1)));
+                    $this->response(array('error' => array('id' => 1, 'message' => 'Unauthorized access')));
                $comment = array(
                     'project_id' => $data['pid'],
                     'defect_id' => $data['did'],
@@ -120,7 +120,7 @@ class Defects extends Auth_Controller{
           }
           else{
           if(!$this->authorized($data['user_id'], $data['pid']))
-               $this->response(array('error' => array('id' => 1)));
+               $this->response(array('error' => array('id' => 1, 'message' => 'Unauthorized access')));
           $comment =  array(
                'project_id' => $data['pid'],
                'defect_id' => $data['did'],
@@ -159,24 +159,35 @@ class Defects extends Auth_Controller{
                $this->load->model("defect_model");
                $result = $this->defect_model->retrieve($id);
                if($result == false)
-                    $this->response('',404);
+                    $this->response(array('error' => array('id' => 3, 'message' => 'Defect Not Found')));
                else{
                     if(!$this->authorized($this->get('user_id'), $this->get_project_of($id)))
-                         $this->response(array('error' => array('id' => 1)));
+                         $this->response(array('error' => array('id' => 1, 'message' => 'Unauthorized access')));
                     $this->response($result);
                }
      }
      protected function viewall($id){ //GET ALL THE DEFECTS FOR A GIVEN PROJECT ID
           $this->load->model('defect_model');
           $Defects = $this->defect_model->retrieveAll($id); //Get all defects for project of id = $id
-          $Prj_Defects = array();
+          $Prj_Defects = new stdClass();
           //$project;
           if(!$Defects){ //No defects found, Raise an error
                $project = 404;
           }
           else {
                foreach($Defects as $defect){ //All is well, Customize what should be sent through JSON
-                    $Prj_Defects[] = array(
+                    if(count($Defects) == 1){
+                         $Prj_Defects = array(
+                         "id" => $defect->defect_id,
+                         "name" => $defect->title,
+                         "status" => $defect->status,
+                         "priority" => $defect->priority,
+                         "severity" => $defect->severity
+                    );
+                    continue;
+                    }
+                    $id = $defect->defect_id;
+                    $Prj_Defects->$id = array(
                          "id" => $defect->defect_id,
                          "name" => $defect->title,
                          "status" => $defect->status,
@@ -185,19 +196,14 @@ class Defects extends Auth_Controller{
                     );
                }
                     $project = array(
-                    'session_id' => $this->session->userdata('session_id'),
-                    'data' => $Prj_Defects,
-                    'error' => array(
-                         'status' => false,
-                         'message' => ""
-                    )
-               )    ;
+                    'data' => $Prj_Defects
+                              )    ;
           }
           if($project == 404)
-               $this->response('', 404);
+               $this->response(array('error' => array('id' => 3, 'message' => 'The requested project was not found.')));
           else{
                if(!$this->authorized($this->get('user_id'), $id))
-                    $this->response(array('error' => array('id' => 1)));
+                    $this->response(array('error' => array('id' => 1, 'message' => 'Unauthorized access')));
                $this->response($project);
           }
      }
@@ -254,7 +260,7 @@ class Defects extends Auth_Controller{
      public function create_post(){
           $this->load->model('defect_model');
           if(!$this->authorized($this->post('user_id'), $this->post('pid')))
-               $this->response(array('error' => array('id' => 1)));
+               $this->response(array('error' => array('id' => 1, 'message' => 'Unauthorized access')));
           $data = array(
                          'title' => $this->post("title"),
                          'severity' => $this->post("severity"),
@@ -286,7 +292,7 @@ class Defects extends Auth_Controller{
 		$status =  $this->get('status');
 		$this ->load ->model("defect_model");
 		if(!$severity && !$priority && !$status)
-		     $this->response('', 404);
+		     $this->response(array('error' => array('id' => 3, 'message'=>'No defects were found')));
 		$results = $this->defect_model->search($severity, $priority, $status);
 		$this->response($results);
 	}
