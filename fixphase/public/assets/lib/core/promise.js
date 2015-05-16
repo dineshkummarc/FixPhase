@@ -26,7 +26,7 @@ define([],function () {
                 funcArr = [func];
             }
 
-            // if promise is done then we dont need to save the give functions
+            // if promise is done then we dont need to save the given functions
             // we just need to execute them
             if(_done)
             {
@@ -35,9 +35,9 @@ define([],function () {
                     _doneFilter(funcArr[i]);
                 }
             }
-            else //we need to store
+            else //we need to add to stored functions
             {
-                _doneFunc = funcArr;
+                _doneFunc = funcArr.concat(_doneFunc ? _doneFunc:[]);
             }
 
             return this;
@@ -74,7 +74,7 @@ define([],function () {
             }
             else //we need to store
             {
-                _failedFunc = funcArr;
+                _failedFunc = funcArr.concat(_failedFunc?_failedFunc:[]);
             }
 
             return this;

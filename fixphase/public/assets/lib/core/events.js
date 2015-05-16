@@ -28,7 +28,7 @@ define([], function() {
         var event = events[regex];
         if(event !== undefined)
         {
-            //check if this object already have callbacks in this event
+            //check if this object already have a callback in this event
             if(event.callbacks[id] === undefined) {
                 //it is a new object, so we increment event callbacks size
                 event[callbacksSize]++;
@@ -110,7 +110,7 @@ define([], function() {
                 }
             }
         }
-    }
+    };
 
     return {
         registerEvent: registerEvent,
