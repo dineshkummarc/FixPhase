@@ -51,10 +51,10 @@ class Projects extends Auth_Controller{
 
     public function insert_contributor(){
 
-        $user_id = $this->put('user_id');
-        $project_id = $this->put('pid');
-        $email = $this->put('email');
-        $role = $this->put('role');
+        $user_id = $this->post('user_id');
+        $project_id = $this->post('pid');
+        $email = $this->post('email');
+        $role = $this->post('role');
 
         $this->load->model('user_model');
 
