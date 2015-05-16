@@ -1,10 +1,6 @@
-.project-info-page-div{
+#project-info-page-div{
     height: 100%;
     overflow-y: auto;
-}
-
-#project-info-page-middle-section{
-    width: 100%;
 }
 
 .project-info-page-title p{
@@ -27,6 +23,10 @@ hr {
     padding: 0;
 }
 
+.pin{
+    width: 100%;
+}
+
 .pin img{
     border: 0px;
     padding-bottom: 0px;
@@ -34,4 +34,35 @@ hr {
 
 .table td{
     border-top: none !important;
+}
+
+.table, #project-info-page-table td{
+
+    border-top: none !important;
+    margin-bottom: 3px;
+    padding-bottom: 3px;
+    text-align: left;
+}
+
+.project-info-page-stat-left{
+    font-weight: bold;
+    color: #C2B9B9;
+}
+
+#project-info-page-stat{
+    border-left: 5px solid #db4865;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+.project-info-page-user p{
+    font-size: 15px;
+    font-weight: bold;
+}
+
+#project-info-page-right-section{
+    height: 300px;
+    padding-right: 2%;
+    overflow-y: auto;
+    overflow-x: hidden;
 }

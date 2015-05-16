@@ -30,10 +30,10 @@
                         <div class="form-group">
                             <?php
                             $attr = array(
-                                'type' => 'email',
+                                'type' => 'email|user',
                                 'class' => 'form-control',
                                 'id' => 'email',
-                            'placeholder' => 'Email Address',
+                            'placeholder' => 'Email Address Or Username',
                                 'name' => 'user_email'
                             );
                             echo form_input($attr);
@@ -71,7 +71,7 @@
                                 <a href= <?php echo base_url().'Register' ?> >SIGN UP</a>
                             </div>
                             <div class="" id="forget-pass">
-                            <a href="#">Forget Password</a>
+                            <a href= <?php echo base_url().'Login/forget_password' ?> >Forget Password</a>
                             </div>
                         </div>
                     <?php echo form_close();?>
