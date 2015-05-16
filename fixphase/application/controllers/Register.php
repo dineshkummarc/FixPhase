@@ -6,6 +6,8 @@ class Register extends CI_Controller{
 
   //use it to load the view of register to the user when the url /Register is loaded
   public function index(){
+      if($this->session->userdata('logged_in'))
+            redirect('/');
 	  $this->load->view('Register_view');
   }
   //use this to validate the input from the user
@@ -13,12 +15,12 @@ class Register extends CI_Controller{
   //or return an error
   public function validate(){
       if(!$this->session->userdata('logged_in')){
-          $this->form_validation->set_rules('username', 'Username','required|alpha_dash|trim|min_length[4]|max_length[32]|is_unique[users.username]|strtolower');
+          $this->form_validation->set_rules('username', 'Username','required|alpha_dash|trim|min_length[4]|max_length[32]|is_unique[users.username]|strtolower|callback_username_validation');
           $this->form_validation->set_rules('email', 'Email','required|trim|is_unique[users.email]|valid_email|strtolower');
-          $this->form_validation->set_rules('password', 'Password','required|min_length[8]|max_length[32]|trim');
+          $this->form_validation->set_rules('password', 'Password','required|min_length[8]|max_length[32]|trim|callback_password_validation');
           $this->form_validation->set_rules('cpassword', 'Confirm Password','required|trim|matches[password]');
 
-          If($this->form_validation->run())
+          if($this->form_validation->run())
           {
               //<===========WORK==========>
               //you are not sending the role to the database
@@ -35,12 +37,12 @@ class Register extends CI_Controller{
               $lname= strtolower($this->input->post('Lname'));
               $data = array(
                   'username'=> strtolower($this->input->post('username')),
-                  'password'=> strtolower($this->input->post('password')),
+                  'password'=> $this->input->post('password'),
                   'email'=> strtolower($this->input->post('email')),
                   'role'=> strtolower($this->input->post('role')),
                   'full_name'=> $fname . " " . $lname
               );
-
+                print_r($data); die;
               if($this->user_model->insert_user($data)){
                   redirect('login');
                   //$this->session->set_userdata($data);
@@ -69,7 +71,25 @@ class Register extends CI_Controller{
           redirect('/');
       }
   }
-
+    public function username_validation($username){
+        $username = strtolower($this->input->post("username"));
+        if(preg_match('^[a-z0-9_-]$^', $username) == 1)
+            return true;
+        else
+        {
+            $this->form_validation->set_message('username_validation', 'Incorrect Username format');
+            return false;
+        }
+    }
+    public function password_validation($password){
+        if(preg_match('^[a-z0-9_-]$^', $password) == 1)
+                 return true;
+        else
+        {
+            $this->form_validation->set_message('password_validation', 'Incorrect Password format');
+                return false;
+        }
+    }
   //<===========WORK==========>
   //Unit testing
   //you have to make a function that calls the validate function with several
