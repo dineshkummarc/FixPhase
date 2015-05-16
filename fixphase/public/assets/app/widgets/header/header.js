@@ -17,6 +17,8 @@ define(
 
             //set onclick project
             project.click(function (ev) {
+                var target = $(ev.target);
+                if(target.hasClass("invite-button") || !target.parent().hasClass("invite-button"))
                 self.goToURL("/projects/"+projects.id);
 
             });
@@ -163,7 +165,7 @@ define(
                     var pid = inviteSubmit.attr("data");
                     var role = invitePopup.find("#invite-select-role").val();
                     errors.invite.detach();
-                    User.getUser(this)
+                    User.getUser(self)
                         .done(function (success, data) {
                             if(!success)
                             {
@@ -194,7 +196,7 @@ define(
                 //when submitting new project
                 projectSubmit.click(function () {
                     errors.addProject.detach();
-                    User.getUser(this)
+                    User.getUser(self)
                         .done(function (success, data) {
                             if(!success)
                             {
@@ -223,14 +225,14 @@ define(
                 });
                 
                 //enabel disable project submit button
-                projectDescInput.keyup(function () {
+                projectDescInput.on("input",function () {
                     projectSubmit.prop('disabled', projectDescInput.val() == "" || projectNameInput.val() == "");
                 });
-                projectNameInput.keyup(function () {
+                projectNameInput.on("input",function () {
                     projectSubmit.prop('disabled', projectDescInput.val() == "" || projectNameInput.val() == "");
                 });
 
-                inviteEmail.keyup(function () {
+                inviteEmail.on("input",function () {
                     inviteSubmit.prop('disabled', inviteEmail.val() == "");
                 });
                 addProjectBtn.click(function () {
@@ -365,6 +367,9 @@ define(
                     }
                 });
                 content.find('[data-toggle="tooltip"]').tooltip();
+
+
+
                 Project.onChange(Project.properties.CUR_PROJECT,this, function (failed, data) {
                     var name = "Projects";
                     if(!failed)

@@ -6,6 +6,8 @@ requirejs.config({
     paths: {
         jquery: "../lib/jquery/jquery",
         "jquery-ui": "../lib/jquery-ui/ui",
+        spin: "../lib/spin/spin",
+
         text: "../lib/requirejs-text/text",
         css : "../lib/require-css/css",
         "bootstrap-css":"../lib/bootstrap/css/bootstrap",
@@ -29,7 +31,7 @@ requirejs.config({
         page: "../lib/core/page",
         widget: "../lib/core/widget",
         store: "../lib/core/store",
-        promise: "../lib/core/promise",
+        promise: "../lib/core/promise"
 
     }
 });

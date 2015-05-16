@@ -11,7 +11,7 @@ define(["store"], function(Store){
             getUser: function (id, caller, data, disableCache) {
                 if(user)
                 {
-                    return this.makeResolvedPromise(caller, true, user)
+                    return this.makeDonePromise(caller, true, user)
                 }
 
                 //otherwise fetch result from server

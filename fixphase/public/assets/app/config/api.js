@@ -34,7 +34,36 @@ define([], {
      * arguments: {user_id, pid, email, role}
      * expected data: empty object
      */
-    inviteToProject:"/projects/contributors"
+    inviteToProject:"/projects/contributors",
+
+    /**
+     * method: GET
+     * arguments: {user_id,pid}
+     * expected data: array of contributors {id: 11, username:''}
+     */
+    getContributors: "/projects/contributors",
+
+    /**
+     * method: GET
+     * arguments: {user_id,pid}
+     * expected data: string with summary
+     */
+    getSummary:"/projects/summary",
+
+    /**
+     * method: GET
+     * arguments: {user_id,pid}
+     * expected data:{
+     *           ‘total_bugs’ : '',
+     *           ‘submited_bugs’: '' ,
+     *           ‘opened_bugs’ : '',
+     *           ‘assigned_bugs’: '' ,
+     *           ‘solved_bugs’ : '',
+     *           ‘closed_bugs’ : ''
+     *       }
+     *
+     */
+    getStats:"/projects/statistics"
 
 
 });

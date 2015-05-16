@@ -3,9 +3,15 @@ define(["store", "stores/User"], function(Store, User){
 
     var projects = null;
     var cur_project= null;
+    var summary = null, contributors = null, stats = null;
 
+    var projectChanged = function () {
+            summary = null;
+            contributors = null;
+            stats = null;
+    };
     // store object
-    return new Store({
+    var Project = new Store({
         //access by this.properties.PROJECTS which represent the id that is needed to observe changes on projects.
         properties: [
             "PROJECTS",
@@ -26,7 +32,7 @@ define(["store", "stores/User"], function(Store, User){
                 //if we already have projects
                 if(projects)
                 {
-                    return this.makeResolvedPromise(caller, true, projects)
+                    return this.makeDonePromise(caller, true, projects)
                 }
 
                 //otherwise fetch result from server
@@ -34,15 +40,7 @@ define(["store", "stores/User"], function(Store, User){
                     id: id,                      // function identifier
                     caller: caller,              // object calling this function
                     data: data,                  // query to be sent to server,
-                    /**
-                     * This is called to filter the passed data argument to the callback of the promise returned,
-                     * when the promise has done.
-                     *
-                     * @param {boolean} success        - indicate whether the data argument is an error object or not
-                     * @param {object}  returnedData   - holds data returned from server (either error object or
-                     *                                   actual data)
-                     * @return {Object}                - argument passed to done promise callbacks as the data argument
-                     */
+
                     filterDoneArguments: function (success, returnedData) {
                         // if error from server return error msg
                         if(!success)
@@ -57,25 +55,19 @@ define(["store", "stores/User"], function(Store, User){
                         projects = returnedData;
                         this.fireChange(this.properties.PROJECTS, true, {type:"change",data:projects}, caller);
                         return projects;
+                    },
+                    filterFailedArguments : function (x, msg) {
+                        return;
                     }
                 });
             },
 
             getProject: function (id, caller, data, disableCache) {
-                //otherwise fetch result from server
                 return this.get({
                     id: id,                      // function identifier
                     caller: caller,              // object calling this function
                     data: data,                  // query to be sent to server,
-                    /**
-                     * This is called to filter the passed data argument to the callback of the promise returned,
-                     * when the promise has done.
-                     *
-                     * @param {boolean} success        - indicate whether the data argument is an error object or not
-                     * @param {object}  returnedData   - holds data returned from server (either error object or
-                     *                                   actual data)
-                     * @return {Object}                - argument passed to done promise callbacks as the data argument
-                     */
+
                     filterDoneArguments: function (success, returnedData) {
                         // if error from server return error msg
                         if(!success)
@@ -89,6 +81,9 @@ define(["store", "stores/User"], function(Store, User){
                         }
 
                         return returnedData;
+                    },
+                    filterFailedArguments : function (x, msg) {
+                        return;
                     }
                 });
             },
@@ -111,11 +106,14 @@ define(["store", "stores/User"], function(Store, User){
                         //check if we have a projects list
                         if(projects)
                         {
-                            projects.push(project);
-                            this.fireChange(this.properties.PROJECTS, true, {type: "add", data: project}, null);
+                            projects[project.id] = project;
+                            this.fireChange(this.properties.PROJECTS, false, {type: "add", data: project}, null);
                         }
                         //return the data
                         return project;
+                    },
+                    filterFailedArguments : function (x, msg) {
+                        return;
                     }
 
 
@@ -133,17 +131,90 @@ define(["store", "stores/User"], function(Store, User){
                         //if failed to create
                         if(!success)
                         {
-                            //data is the error msg
-                            if(returnedData.id == Store.prototype.Errors.NOT_FOUND){
-                                return "No user found with such email."
-                            }
-
-                            return "Uknown error of id " + returnedData.id;
+                            return returnedData.message;
                         }
                         return null;
+                    },
+                    filterFailedArguments : function (x, msg) {
+                        return;
                     }
 
 
+                });
+            },
+
+
+            getContributors: function (id, caller, data, disableCache) {
+                if(contributors)
+                {
+                    return this.makeDonePromise(caller, true, contributors);
+                }
+                return this.get({
+                    id: id,                      // function identifier
+                    caller: caller,              // object calling this function
+                    data: data,                  // query to be sent to server,
+
+                    filterDoneArguments: function (success, returnedData) {
+                        // if error from server return error msg
+                        if(!success)
+                        {
+
+                            return returnedData.message;
+                        }
+                        return returnedData;
+                    },
+                    filterFailedArguments : function (x, msg) {
+                        return;
+                    }
+                });
+            },
+
+            getSummary: function (id, caller, data, disableCache) {
+                if(summary)
+                {
+                    return this.makeDonePromise(caller, true, summary);
+                }
+                return this.get({
+                    id: id,                      // function identifier
+                    caller: caller,              // object calling this function
+                    data: data,                  // query to be sent to server,
+
+                    filterDoneArguments: function (success, returnedData) {
+                        // if error from server return error msg
+                        if(!success)
+                        {
+
+                            return returnedData.message;
+                        }
+                        return returnedData;
+                    },
+                    filterFailedArguments : function (x, msg) {
+                        return;
+                    }
+                });
+            },
+
+            getStats: function (id, caller, data, disableCache) {
+                if(stats)
+                {
+                    return this.makeDonePromise(caller, true, stats);
+                }
+                return this.get({
+                    id: id,                      // function identifier
+                    caller: caller,              // object calling this function
+                    data: data,                  // query to be sent to server,
+
+                    filterDoneArguments: function (success, returnedData) {
+                        // if error from server return error msg
+                        if(!success)
+                        {
+                            return returnedData.message;
+                        }
+                        return returnedData;
+                    },
+                    filterFailedArguments : function (x, msg) {
+                        return;
+                    }
                 });
             }
         },
@@ -170,6 +241,7 @@ define(["store", "stores/User"], function(Store, User){
                     {
                         cur_project = projects[args.pid];
                         this.fireChange(this.properties.CUR_PROJECT, false,cur_project , null);
+                        projectChanged();
                     }
                 }
                 else
@@ -189,6 +261,7 @@ define(["store", "stores/User"], function(Store, User){
                                     }
                                     cur_project = data;
                                     this.fireChange(this.properties.CUR_PROJECT, false,cur_project , null);
+                                    projectChanged();
                                 })
                                 .fail(function (x, msg) {
                                     this.fireChange(this.properties.CUR_PROJECT, true, null, null);
@@ -207,4 +280,7 @@ define(["store", "stores/User"], function(Store, User){
         }
 
     });
+
+    return Project;
+
 });

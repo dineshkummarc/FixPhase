@@ -31,7 +31,15 @@ class Projects extends Auth_Controller{
         if($this->get('pid') != null){
             $this->get_project_summary($this->get('pid'));
         }
+        else{
+            $json = new stdClass();
+            $json->error = new stdClass();
+            $json->error->id = '2';
+            $json->error->message = 'Project id not supplied';
+            $this->response($json);
+        }
     }
+
 
     public function contributors_get(){
         if($this->get('pid') != null){
@@ -70,7 +78,7 @@ class Projects extends Auth_Controller{
                     $result = $this->project_model->insert_contributor($contributor_id, $project_id, $role);
                     if($result) {
                         $user_name = $this->user_model->get_user_name($user_id)->full_name;
-                        $project_name = $this->project_model->get_project($project_id)->project_name;
+                        $project_name = $this->project_model->get_project($project_id)->name;
                         if($user_name && $project_name){
                             //email
                             $this->load->library('email');
@@ -119,7 +127,7 @@ class Projects extends Auth_Controller{
                     }
                 }else{
                     $json->error = new stdClass();
-                    $json->error->id = '-1';
+                    $json->error->id = '5';
                     $json->error->message = 'Error Duplicate Entry';
                 }
             }else{
@@ -168,14 +176,13 @@ class Projects extends Auth_Controller{
     public function get_project_summary($project_id){
         //request to get a specific project summary with the project id
         $this->load->model('project_model');
-        $data = $this->project_model->get_project($project_id);
+        $data = $this->project_model->get_project_info($project_id);
         if($data){
             if($this->project_model->has_auth($this->get('user_id'), $project_id)){
 
                 $json = array(
-                    'data' => array(
-                        'summary' => $data->description
-                    )
+                    'data' => $data->description
+
                 );
             }else{
                 //unauthorized
@@ -191,7 +198,8 @@ class Projects extends Auth_Controller{
 
             $json = array(
                 'error' => array(
-                    'id' => '3'
+                    'id' => '3',
+                    'message' => "Project not found"
                 )
             );
             $this->response($json);        }
@@ -205,9 +213,8 @@ class Projects extends Auth_Controller{
             if($this->project_model->has_auth($this->get('user_id'), $project_id)){
 
                 $json = array(
-                    'data' => array(
-                        'contributors' => $this->project_model->get_contributors($project_id)
-                    )
+                    'data' =>  $this->project_model->get_contributors($project_id)
+
                 );
             }else{
                 //unauthorized
@@ -217,7 +224,7 @@ class Projects extends Auth_Controller{
                     )
                 );
             }
-            $this->response($json);
+            $this->response($json); //;array of contributors {id: 11, username:''}
         }else{
             //not found
 
@@ -233,17 +240,14 @@ class Projects extends Auth_Controller{
         $data = $this->project_model->get_project($project_id);
         if($data){
             if($this->project_model->has_auth($this->get('user_id'), $project_id)){
-                $statistics = new stdClass();
-                $statistics->total_bugs = $this->project_model->get_bugs_count($project_id, '');
-                $statistics->opened_bugs = $this->project_model->get_bugs_count($project_id, 'opened');
-                $statistics->assigned_bugs = $this->project_model->get_bugs_count($project_id, 'assigned');
-                $statistics->solved_bugs = $this->project_model->get_bugs_count($project_id, 'solved');
-                $statistics->closed_bugs = $this->project_model->get_bugs_count($project_id, 'closed');
+                $data->total_bugs = $this->project_model->get_bugs_count($project_id, '');
+                $data->opened_bugs = $this->project_model->get_bugs_count($project_id, 'opened');
+                $data->assigned_bugs = $this->project_model->get_bugs_count($project_id, 'assigned');
+                $data->solved_bugs = $this->project_model->get_bugs_count($project_id, 'solved');
+                $data->closed_bugs = $this->project_model->get_bugs_count($project_id, 'closed');
 
                 $json = array(
-                    'data' => array(
-                        'statistics' => $statistics
-                    )
+                    'data' => $data
                 );
             }else{
                 //unauthorized
@@ -310,7 +314,7 @@ class Projects extends Auth_Controller{
 
                 $json = array(
                     'data' => array(
-                        'summary' => $data->description,
+                        'summary' => $this->project_model->get_project_info($project_id),
                         'owner' => $data->created_by,
                         'contributors' => $this->project_model->get_contributors($project_id),
                         'statistics' => $statistics
