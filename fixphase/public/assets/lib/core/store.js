@@ -1,5 +1,5 @@
 define(["jquery", "observer", "identity", "core", "promise","api"],
-function ($, observer, Identity, core, Promise, rest, api, store) {
+function ($, Observer, Identity, core, Promise,api) {
 
     var stubIdentity = {getId: function () {
         return -1;
@@ -7,14 +7,13 @@ function ($, observer, Identity, core, Promise, rest, api, store) {
     /**
      * Used In the begining of a new get request to check if the completed request promise should have its
      * callbacks called or not.
-     * @param {Object}   store           - The store object
      * @param {object}   activeCalls     - List of active calls
      * @param {String}   id              - The function name
      * @param {Object}   caller          - Object calling the function
      * @param {Object}   requestInstance - An instance of the current request object
      * @param {int}      requestedTime   - The time of this request
      */
-    var shouldCallCallbacks = function(store, activeCalls, id, caller, requestInstance, requestedTime)
+    var shouldCallCallbacks = function(activeCalls, id, caller, requestInstance, requestedTime)
     {
         // check if another request was made before this one finish
         if(requestInstance.time > requestedTime)
@@ -83,7 +82,8 @@ function ($, observer, Identity, core, Promise, rest, api, store) {
         promise = requestInstance.promise;
         return {
             requestedTime: requestedTime,
-            requestInstance: requestInstance
+            requestInstance: requestInstance,
+            promise: promise
         };
 
     };
@@ -95,8 +95,9 @@ function ($, observer, Identity, core, Promise, rest, api, store) {
      * @returns {Function}
      */
     var createFunc = function (data, funcname) {
+        var self = this;
         return function () {
-            data.ajaxMethods[funcname].apply(this, [funcname].concat(Array.prototype.slice.call(arguments)));
+            return  data.ajaxMethods[funcname].apply(self, [funcname].concat(Array.prototype.slice.call(arguments)));
         }
     };
 
@@ -144,7 +145,7 @@ function ($, observer, Identity, core, Promise, rest, api, store) {
         _exitFunc = function () {};
         _lastInActive = 0;
         _changeEventListeners = {};
-        _listenersWatchedProperties = {}
+        _listenersWatchedProperties = {};
         /*
          * Saves active calls for this store
          * {
@@ -183,7 +184,7 @@ function ($, observer, Identity, core, Promise, rest, api, store) {
                         console.warn("Ajax get: function [" + funcname + "] does not have a corresponding api url.");
                         continue;
                     }
-                    this[funcname] = createFunc(data,funcname);
+                    this[funcname] = createFunc.call(this,data,funcname);
                 }
             }
             //add properties
@@ -304,7 +305,8 @@ function ($, observer, Identity, core, Promise, rest, api, store) {
          * @returns {Object} - A promise
          */
         this.get = function (options) {
-            var setup = setupRequest(options, _activeCalls);
+            var self = this;
+            var setup = setupRequest.call(this,options, _activeCalls);
             if(!setup)
             {
                 return new Promise();
@@ -314,12 +316,12 @@ function ($, observer, Identity, core, Promise, rest, api, store) {
             $.ajax({
                 url: api[options.id],
                 method: "GET",
-                data: data,
+                data: options.data,
                 dataType: "json"
             })
                 .done(function (data) {
                     // check if we should accept this request
-                    if (!shouldCallCallbacks(this, _activeCalls, options.id, options.caller,
+                    if (!shouldCallCallbacks.call(self, _activeCalls, options.id, options.caller,
                             setup.requestInstance, setup.requestedTime)) {
                         return;
                     }
@@ -343,7 +345,7 @@ function ($, observer, Identity, core, Promise, rest, api, store) {
                     if(options.filterDoneArguments)
                     {
                         // get filter result and make it our new returned data
-                        returnedData = options.filterDoneArguments(success, returnedData);
+                        returnedData = options.filterDoneArguments.call(self,success, returnedData);
                     }
 
                     // now resolve the promise object to call its callbacks passing a filter
@@ -356,7 +358,7 @@ function ($, observer, Identity, core, Promise, rest, api, store) {
                 })
                 .fail(function (jqXHR, statusMsg) {
                     // check if we should accept this request
-                    if(!shouldCallCallbacks(this, _activeCalls, options.id, options.caller,
+                    if(!shouldCallCallbacks.call(self, _activeCalls, options.id, options.caller,
                             setup.requestInstance, setup.requestedTime)) {
                         return;
                     }
@@ -367,7 +369,7 @@ function ($, observer, Identity, core, Promise, rest, api, store) {
                     if(options.filterFailedArguments)
                     {
                         // get filter result and make it our new returned data
-                        returnedData = options.filterFailedArguments(jqXHR, returnedData)
+                        returnedData = options.filterFailedArguments.call(self,jqXHR, returnedData)
                     }
 
                     // now set failed promise object to call its callbacks passing a filter
@@ -381,7 +383,8 @@ function ($, observer, Identity, core, Promise, rest, api, store) {
         };
 
         this.set = function (options) {
-            var setup = setupRequest(options, _activeCalls);
+            var self = this;
+            var setup = setupRequest.call(this, options, _activeCalls);
             if(!setup)
             {
                 return new Promise();
@@ -395,12 +398,12 @@ function ($, observer, Identity, core, Promise, rest, api, store) {
             $.ajax({
                 url: api[options.id],
                 method: options.method,
-                data: data,
+                data: options.data,
                 dataType: "json"
             })
                 .done(function (data) {
                     // check if we should accept this request
-                    if (!shouldCallCallbacks(this, _activeCalls, options.id, options.caller,
+                    if (!shouldCallCallbacks.call(self, _activeCalls, options.id, options.caller,
                             setup.requestInstance, setup.requestedTime)) {
                         return;
                     }
@@ -422,7 +425,7 @@ function ($, observer, Identity, core, Promise, rest, api, store) {
                     if(options.filterDoneArguments)
                     {
                         // get filter result and make it our new returned data
-                        returnedData = options.filterDoneArguments(success, returnedData);
+                        returnedData = options.filterDoneArguments.call(self,success, returnedData);
                     }
 
                     // now resolve the promise object to call its callbacks passing a filter
@@ -434,7 +437,7 @@ function ($, observer, Identity, core, Promise, rest, api, store) {
                 })
                 .fail(function (jqXHR, statusMsg) {
                     // check if we should accept this request
-                    if(!shouldCallCallbacks(this, _activeCalls, options.id, options.caller,
+                    if(!shouldCallCallbacks.call(self, _activeCalls, options.id, options.caller,
                             setup.requestInstance, setup.requestedTime)) {
                         return;
                     }
@@ -446,7 +449,7 @@ function ($, observer, Identity, core, Promise, rest, api, store) {
                     if(options.filterFailedArguments)
                     {
                         // get filter result and make it our new returned data
-                        returnedData = options.filterFailedArguments(jqXHR, returnedData)
+                        returnedData = options.filterFailedArguments.call(self,jqXHR, returnedData)
                     }
 
                     // now set failed promise object to call its callbacks passing a filter
@@ -473,7 +476,7 @@ function ($, observer, Identity, core, Promise, rest, api, store) {
             // if callback was not defined or if the listener dont hav identity, then, skip register
             if(callback === null || !(listener instanceof Identity))
                 return false;
-            callback = function () {
+            _callback = function () {
                 callback.apply(listener, Array.prototype.slice.call(arguments))
             };
             //check if given event already exists
@@ -485,7 +488,7 @@ function ($, observer, Identity, core, Promise, rest, api, store) {
                     //it is a new listener so lets increment listerners count
                     event.listenersCount++;
                 }
-                event.callbacks[listener.getId()] = callback;
+                event.callbacks[listener.getId()] = _callback;
 
             }
             else// event doesnt exist
@@ -493,11 +496,11 @@ function ($, observer, Identity, core, Promise, rest, api, store) {
                 //create a callbacks object for the new event
                 var callbacks = {};
                 //add object's callback to it
-                callbacks[listener.getId()] = callback;
+                callbacks[listener.getId()] = _callback;
                 //add the event
                 var event = {listenersCount: 1, callbacks:callbacks};
 
-                _changeEventListeners[listener.getId()] = event;
+                _changeEventListeners[property_id] = event;
 
             }
             //save for fast access on delete
@@ -554,20 +557,17 @@ function ($, observer, Identity, core, Promise, rest, api, store) {
             if(!(execluded instanceof Identity)){
                execluded = stubIdentity;
             }
-            for(var event_key in _changeEventListeners)
+            var event = _changeEventListeners[property_id];
+            if(!event)
+                return;
+
+            for(var listener_id in event.callbacks)
             {
                 //check if this event has listeners
-                var event = _changeEventListeners[event_key];
-                if(event !== undefined)
+                var callback = event.callbacks[listener_id];
+                if(callback !== undefined && listener_id != execluded.getId())
                 {
-                    //loop over all listeners and call their callbacks
-                    for(var listener_id in event.callbacks){
-                        var callback = event.callbacks[listener_id];
-                        if(callback !== undefined && listener_id != execluded.getId())
-                        {
-                            callback(failed, data);
-                        }
-                    }
+                    callback(failed, data);
                 }
             }
         }
@@ -584,6 +584,10 @@ function ($, observer, Identity, core, Promise, rest, api, store) {
         USER_ID_TAMPERED: 4
     };
 
+    Store.prototype.goToURL = function (url) {
+        core.changeURL(url);
+    };
 
 
+    return Store;
 });

@@ -189,7 +189,7 @@
     font-size:14px;
 }
 
-#project-list{
+#projects-list{
     max-height: 150px;
     overflow-y: auto;
     list-style-type:none;

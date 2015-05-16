@@ -19,32 +19,32 @@ define({
     },
 
     info: {
-        path: '/project/:pid',
+        path: '/projects/:pid',
         page: 'pages/projectInfo/projectInfo',
         skeletonTree: ['skeletons/basic/basic', 'skeletons/nav/nav']
     },
 
     defects: {
-        path: '/project/:pid/defects',
+        path: '/projects/:pid/defects',
         page: 'pages/defects/defects' ,
         skeletonTree: ['skeletons/basic/basic', 'skeletons/nav/nav']
     },
 
 
     defectCreate: {
-        path: '/project/:pid/defect/create',
+        path: '/projects/:pid/defect/create',
         page: 'pages/defectCreate/defectCreate',
         skeletonTree: ['skeletons/basic/basic', 'skeletons/nav/nav']
     },
 
     defectView: {
-        path: '/project/:pid/defect/:did',
+        path: '/projects/:pid/defect/:did',
         page: 'pages/defectView/defectView' ,
         skeletonTree: ['skeletons/basic/basic', 'skeletons/nav/nav']
     },
 
     graphs: {
-        path: '/project/:pid/graphs',
+        path: '/projects/:pid/graphs',
         page: 'pages/graphs/graphs' ,
         skeletonTree: ['skeletons/basic/basic', 'skeletons/nav/nav']
     },

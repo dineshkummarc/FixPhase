@@ -42,7 +42,7 @@
                         <input type="text" class="form-control" id="search-box" placeholder="Search for...">
                     </li>
                     <li id="projects-list-container">
-                        <ul class="pre-scrollable" id="project-list">
+                        <ul class="pre-scrollable" id="projects-list">
 
                         </ul>
                     </li>
@@ -68,6 +68,10 @@
             <form id="inviteForm" novalidate="novalidate">
                 <div class="form-group">
                     <input type="email" class="form-control " id="invite-email" placeholder="Email">
+                    <select id="invite-select-role">
+                        <option value="0">Tester</option>
+                        <option value="1">Developer</option>
+                    </select>
                 </div>
                 <button type="button" class="btn btn-default " id="submit-inv">Invite</button>
             </form>

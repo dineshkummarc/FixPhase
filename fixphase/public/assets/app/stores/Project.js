@@ -138,7 +138,7 @@ define(["store", "stores/User"], function(Store, User){
                                 return "No user found with such email."
                             }
 
-                            return "Uknown error of id " + data.id;
+                            return "Uknown error of id " + returnedData.id;
                         }
                         return null;
                     }
@@ -151,51 +151,51 @@ define(["store", "stores/User"], function(Store, User){
 
         //on setup
         setup: function () {
-            this.observeURL(/project\/.+/, function (url, urlPath, args) {
+            this.observeURL(/projects\/.+/, function (url, urlPath, args) {
                 //if we have projects
                 //if we have the projects get it from them
                 if(cur_project)
                 {
-                    if(cur_project.id == args.id)
+                    if(cur_project.id == args.pid)
                         return;
                 }
                 if(projects)
                 {
-                    if(!projects[args.id]){
+                    if(!projects[args.pid]){
 
-                        this.fireChange(this.properties.CUR_PROJECT, false, {_empty:true}, null);
+                        this.fireChange(this.properties.CUR_PROJECT, true, {_empty:true}, null);
                         this.goToURL("/notfound");
                     }
                     else
                     {
-                        cur_project = projects[args.id];
-                        this.fireChange(this.properties.CUR_PROJECT, true,cur_project , null);
+                        cur_project = projects[args.pid];
+                        this.fireChange(this.properties.CUR_PROJECT, false,cur_project , null);
                     }
                 }
                 else
                 {
                     //get user id
-                    User.getUser()
+                    User.getUser(this)
                         .done(function (success, data) {
                             //get project
-                            this.getProject(this, {user_id:data.user_id, pid:args.id})
+                            this.getProject(this, {user_id:data.user_id, pid:args.pid})
                                 .done(function (success, data) {
                                     //we reached server but we got an error so go to notfound
                                     if(!success)
                                     {
-                                        this.fireChange(this.properties.CUR_PROJECT, false, {_empty:true}, null);
+                                        this.fireChange(this.properties.CUR_PROJECT, true, {_empty:true}, null);
                                         this.goToURL("/notfound");
                                         return;
                                     }
                                     cur_project = data;
-                                    this.fireChange(this.properties.CUR_PROJECT, true,cur_project , null);
+                                    this.fireChange(this.properties.CUR_PROJECT, false,cur_project , null);
                                 })
-                                .fail(function () {
-                                    this.fireChange(this.properties.CUR_PROJECT, false, null, null);
+                                .fail(function (x, msg) {
+                                    this.fireChange(this.properties.CUR_PROJECT, true, null, null);
                                 });
                         })
-                        .fail(function(){
-                            this.fireChange(this.properties.CUR_PROJECT, false, null, null);
+                        .fail(function(x, msg){
+                            this.fireChange(this.properties.CUR_PROJECT, true, null, null);
                         });
                 }
             });

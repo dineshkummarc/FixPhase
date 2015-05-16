@@ -33,7 +33,7 @@ class Projects extends Auth_Controller{
         }
     }
 
-    public function contributor_get(){
+    public function contributors_get(){
         if($this->get('pid') != null){
             $this->get_project_contributors($this->get('pid'));
         }
@@ -45,7 +45,7 @@ class Projects extends Auth_Controller{
         }
     }
 
-    public function contributor_post(){
+    public function contributors_post(){
         $this->insert_contributor();
     }
 
@@ -59,9 +59,9 @@ class Projects extends Auth_Controller{
         $this->load->model('user_model');
 
         $json = new stdClass();
-        $json->data = new stdClass();
 
-        if($user_id != null && $project_id != null && $email != null && $role != null && $this->user_model->user_exists($user_id)){
+        if($user_id != null && $project_id != null && $email != null && $role != null &&
+            $this->user_model->user_exists($user_id)){
             $contributor_id = $this->user_model->get_user_by_email($email);
             if($contributor_id){
                 $contributor_id = $contributor_id[0]->user_id;
@@ -107,31 +107,31 @@ class Projects extends Auth_Controller{
                                 //$json->data->project_id = $result;
                                 $json->data = new stdClass();
                             }else{
-                                $json->data->error = new stdClass();
-                                $json->data->error->id = '2';
-                                $json->data->error->message = 'Error sending email';
+                                $json->error = new stdClass();
+                                $json->error->id = '5';
+                                $json->error->message = 'Error sending email';
                             }
                         }
                     }else{
-                        $json->data->error = new stdClass();
-                        $json->data->error->id = '2';
-                        $json->data->error->message = 'Error user could not be invited';
+                        $json->error = new stdClass();
+                        $json->error->id = '2';
+                        $json->error->message = 'Error user could not be invited';
                     }
                 }else{
-                    $json->data->error = new stdClass();
-                    $json->data->error->id = '2';
-                    $json->data->error->message = 'Error Duplicate Entry';
+                    $json->error = new stdClass();
+                    $json->error->id = '-1';
+                    $json->error->message = 'Error Duplicate Entry';
                 }
             }else{
-                $json->data->error = new stdClass();
-                $json->data->error->id = '2';
-                $json->data->error->message = 'Invalid email';
+                $json->error = new stdClass();
+                $json->error->id = '3';
+                $json->error->message = 'Invalid email';
             }
 
         }else{
-            $json->data->error = new stdClass();
-            $json->data->error->id = '2';
-            $json->data->error->message = 'Invalid user id';
+            $json->error = new stdClass();
+            $json->error->id = '4';
+            $json->error->message = 'Invalid user id';
         }
 
         $this->response($json);
@@ -139,28 +139,27 @@ class Projects extends Auth_Controller{
 
     public function insert_project(){
         $user_id = $this->post('user_id');
-        $project_name = $this->post('project_name');
-        $project_summary = $this->post('project_summary');
+        $project_name = $this->post('name');
+        $project_summary = $this->post('summary');
 
         $this->load->model('user_model');
 
         $json = new stdClass();
-        $json->data = new stdClass();
 
         if($user_id != null && $project_name != null && $project_summary != null && $this->user_model->user_exists($user_id)){
             $this->load->model('project_model');
             $result = $this->project_model->insert_project($project_name, $project_summary, $user_id);
             if($result){
-                $json->data->project_id = $result;
+                $json->data = $result;
             }else{
-                $json->data->error = new stdClass();
-                $json->data->error->id = '2';
-                $json->data->error->message = 'Invalid Entry';
+                $json->error = new stdClass();
+                $json->error->id = '2';
+                $json->error->message = 'Invalid Entry';
             }
         }else{
-            $json->data->error = new stdClass();
-            $json->data->error->id = '2';
-            $json->data->error->message = 'Invalid user id';
+            $json->error = new stdClass();
+            $json->error->id = '2';
+            $json->error->message = 'Invalid user id';
         }
 
         $this->response($json);

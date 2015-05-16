@@ -6,7 +6,7 @@ define([], {
      * method: GET
      * expexted data: {user_id:11, name:''}
      */
-    getUser: "users",
+    getUser: "/users",
 
     //---- Project ----//
 
@@ -31,10 +31,10 @@ define([], {
     createProject: "/projects",
     /**
      * method: POST
-     * arguments: {user_id, email}
+     * arguments: {user_id, pid, email, role}
      * expected data: empty object
      */
-    inviteToProject:"/project/contributers"
+    inviteToProject:"/projects/contributors"
 
 
 });
