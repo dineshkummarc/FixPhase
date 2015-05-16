@@ -11,17 +11,7 @@ class Defect extends Auth_Controller{
      }
      public function index_get($did = "index"){
           $this->load->model("defect_model");
-          if($did == 'index' && !$this->get('pid') && !$this->get('did'))
-               $this->load->view("errors/no_defect");
-          else if(is_numeric($did)){
-               $this->load->model("defect_model");
-               $result = $this->defect_model->retrieve($did);
-               if($result == false)
-                    $this->load->view("errors/no_defect");
-               else
-                    $this->load->view("defect_view", $result);
-          }
-          else if($this->get('user_id') && $this->get('did'))
+          if($this->get('user_id') && $this->get('did'))
                $this->view($this->get('did'));
           else if($this->get('user_id') && $this->get('pid'))
                $this->viewall($this->get('pid'));
@@ -211,7 +201,7 @@ class Defect extends Auth_Controller{
                $this->response($project);
           }
      }
-     public function create($project = "none"){ //Create a new defect
+/*     public function create($project = "none"){ //Create a new defect
           $this->load->model("project_model");
           $this->load->library('upload', array(
                                              'upload_path' => "../public/uploads",
@@ -260,6 +250,25 @@ class Defect extends Auth_Controller{
                     }
                }
           }
+     } */
+     public function create_post(){
+          $this->load->model('defect_model');
+          if(!$this->authorized($this->post('user_id'), $this->post('pid')))
+               $this->response(array('error' => array('id' => 1)));
+          $data = array(
+                         'title' => $this->post("title"),
+                         'severity' => $this->post("severity"),
+                         'priority' => $this->post("priority"),
+                         'related_project_id' => $this->post("product"),
+                         'version' => $this->post("version"),
+                         'description' => $this->post("description"),
+                         'status' => 'Open',
+                         'date_raised' => date("Y-m-d"),
+                         'platform' => $this->post('platform'),
+                         'identified_by' => $this->session->userdata('session_id')
+          );
+          if($this->defect_model->insert($data))
+               $this->response('',200);
      }
      protected function project_exists($id){
           $this->load->model("project_model");
