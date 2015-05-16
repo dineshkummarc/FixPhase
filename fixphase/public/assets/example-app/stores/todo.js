@@ -35,7 +35,7 @@ define(["store"], function(Store){
                 //if we already have todos and no disableCache return a resolved promise
                 if(todos && !disableCache)
                 {
-                    return this.makeResolvedPromise(caller, true, todos)
+                    return this.makeDonePromise(caller, true, todos)
                 }
 
                 //otherwise fetch result from server

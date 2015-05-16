@@ -1,6 +1,7 @@
 #skeleton-basic{
     overflow: hidden;
     height: 100%;
+    padding-top: 40px;
 }
 
 #skeleton-basic-widget-header{
@@ -14,5 +15,6 @@
 #skeleton-basic-inject{
     padding-top: 50px;
     height: 100%;
+    overflow-y: auto;
 }
 

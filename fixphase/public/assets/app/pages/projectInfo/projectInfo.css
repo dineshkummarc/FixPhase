@@ -1,10 +1,9 @@
 #project-info-page-div{
-    height: 100%;
     overflow-y: auto;
 }
 
-.project-info-page-title p{
-    margin: 1em 0 0.5em 0;
+.project-info-page-title {
+    padding: 1em 0 0.5em 0;
     color: #343434;
     font-weight: bold;
     font-family: Arial;
@@ -66,3 +65,7 @@ hr {
     overflow-y: auto;
     overflow-x: hidden;
 }
+
+#project-info-page-middle-section{
+    min-height: 100px;
+ }

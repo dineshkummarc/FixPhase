@@ -274,13 +274,13 @@ function ($, Observer, Identity, core, Promise,api) {
         };
 
         /**
-         * Create a resolved promise, where callbacks will have caller as its context and will receive success & data
-         * as arguments.
+         * Create a resolved promise with done state, where callbacks will have caller as its context and will receive
+         * success & data as arguments.
          * @param {object} caller - An object of type identifier, where the callback have this as its context
          * @param {boolean} success - indicates whether data is an error msg or actual data
          * @param {object } data
          */
-        this.makeResolvedPromise = function (caller, success, data) {
+        this.makeDonePromise = function (caller, success, data) {
             //make new promise object
             var promise = new Promise();
             //set the done & create callback filter to handle context and passed arguments
@@ -289,6 +289,24 @@ function ($, Observer, Identity, core, Promise,api) {
             });
             return promise;
         };
+
+        /**
+         * Create a resolved promise with failed state, where callbacks will have caller as its context and
+         * will receive success & data as arguments.
+         * @param {object} caller - An object of type identifier, where the callback have this as its context
+         * @param {boolean} success - indicates whether data is an error msg or actual data
+         * @param {object } data
+         */
+        this.makeFailedPromise = function (caller, errorMsg){
+            //make new promise object
+            var promise = new Promise();
+            //set the done & create callback filter to handle context and passed arguments
+            promise.setFailed(function (f) {
+                f.call(caller,errorMsg);
+            });
+            return promise;
+        };
+
 
         /**
          * Used to issue a tracked get request, that makes sure to save attached callbacks so if a new request is
