@@ -62,6 +62,12 @@ class defect_model extends CI_Model{
           $this->unit->run($this->retrieve(502), false, 'Retrieve a certain defect');
           $this->unit->run($this->get_project(2), 'is_int', 'Retrieve project ID of a defect');
           $this->unit->run($this->get_project(333), false, 'Retrieve project ID of a defect');
+		  $this->unit->run($this->search('high', 'high', 'new'), 'is_array', 'Search for a defect');
+		  $this->unit->run($this->search('high', 'low', 'open'), false, 'Search for a defect');
+		  $this->unit->run($this->search('high', 'high', 'closed'), false, 'Search for a defect');
+		  $this->unit->run($this->search('high', 'high', 'new'), false, 'Search for a defect');
+		  
+		  
           echo $this->unit->report();
      }
 
