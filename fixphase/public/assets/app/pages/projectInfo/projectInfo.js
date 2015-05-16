@@ -1,3 +1,36 @@
-/**
- * Created by karim on 4/27/15.
- */
+define(
+    [
+        "text!pages/projectInfo/projectInfo.html!strip",
+        "page",
+        'jquery',
+        "css!pages/projectInfo/projectInfo.css",
+    ],
+    function (html, Page, $) {
+
+        return new Page({
+
+            //a must have property where content are setup
+            makeContent: function () {
+                var content = $(($.parseHTML($.trim(html)))[0]);
+
+                return content;
+            },
+
+            //all url observe goes here
+            observeURLS: function () {
+
+            },
+
+            //called when the page is in view
+            //you can fetch data and show them here on startup if you want
+            start: function () {
+
+            },
+
+            exit: function(){
+
+            }
+        });
+
+    }
+);

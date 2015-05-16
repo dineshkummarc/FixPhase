@@ -269,13 +269,12 @@ class Projects extends Auth_Controller{
     public function get_project($project_id){
         //request to get data about a specific project with the project id
         $this->load->model('project_model');
-        //======================================================
         $data = $this->project_model->get_project($project_id);
         if($data){
             if($this->project_model->has_auth($this->get('user_id'), $project_id)){
 
                 $json = array(
-                    'data' => ''
+                    'data' => $data
                 );
             }else{
                 //unauthorized
