@@ -395,7 +395,21 @@ define(
                         }
                     }
                 });
-
+                var user_name = content.find("#header-user-name");
+                User.getUser(this)
+                    .done(function (success, user) {
+                        if(!success)
+                        {
+                            user_name.text("....");
+                        }
+                        else
+                        {
+                            user_name.text(user.name);
+                        }
+                    })
+                    .fail(function (msg) {
+                        user_name.text("....");
+                    });
 
 
             },

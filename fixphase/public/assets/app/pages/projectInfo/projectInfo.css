@@ -1,5 +1,7 @@
 #project-info-page-div{
     overflow-y: auto;
+    height: 100%;
+    padding-top: 40px;
 }
 
 .project-info-page-title {

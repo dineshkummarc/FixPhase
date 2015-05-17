@@ -31,7 +31,7 @@ class user_model extends CI_Model{
      * @author: Abdulaziz Mohamed Alaa
      */
     public function get_user_by_email($email){
-        $this->db->select('user_id, full_name');
+        $this->db->select('user_id, username');
         $this->db->where('email',$email);
         $query = $this->db->get('users');
         if($query->num_rows() > 0){

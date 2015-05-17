@@ -70,9 +70,9 @@ class Projects extends Auth_Controller{
 
         if($user_id != null && $project_id != null && $email != null && $role != null &&
             $this->user_model->user_exists($user_id)){
-            $contributor_id = $this->user_model->get_user_by_email($email);
-            if($contributor_id){
-                $contributor_id = $contributor_id[0]->user_id;
+            $contributor = $this->user_model->get_user_by_email($email);
+            if($contributor){
+                $contributor_id = $contributor[0]->user_id;
                 $this->load->model('project_model');
                 if(!$this->project_model->is_contributor($contributor_id, $project_id)){
                     $result = $this->project_model->insert_contributor($contributor_id, $project_id, $role);
@@ -113,7 +113,10 @@ class Projects extends Auth_Controller{
 
                             if($this->email->send()){
                                 //$json->data->project_id = $result;
-                                $json->data = new stdClass();
+
+                                $data = array("data" => array("user_id" => $contributor_id,
+                                    "username" => $contributor[0]->username));
+                                $json = $data;
                             }else{
                                 $json->error = new stdClass();
                                 $json->error->id = '5';
