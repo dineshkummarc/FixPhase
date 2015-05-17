@@ -32,13 +32,13 @@ define({
 
 
     defectCreate: {
-        path: '/projects/:pid/defect/create',
+        path: '/projects/:pid/defects/create',
         page: 'pages/defectCreate/defectCreate',
         skeletonTree: ['skeletons/basic/basic', 'skeletons/nav/nav']
     },
 
     defectView: {
-        path: '/projects/:pid/defect/:did',
+        path: '/projects/:pid/defects/:did',
         page: 'pages/defectView/defectView' ,
         skeletonTree: ['skeletons/basic/basic', 'skeletons/nav/nav']
     },

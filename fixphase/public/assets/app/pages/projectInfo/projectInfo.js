@@ -18,6 +18,22 @@ define(
         {
             container.remove(".error-cont");
         };
+
+        var addContributor = function(contributorsArea, username)
+        {
+            var pin = $("<div/>", {class:"pin"});
+            var imageCont = $("<div/>", {class:"col-md-2 col-sm-1 col-xs-1"});
+            var image = $("<img/>", {src:"/assets/images/empty.jpg"});
+            imageCont.append(image);
+
+            var user = $("<div/>", {class:"col-md-10 col-sm-10 col-xs-10 project-info-page-user"});
+            user.text(username);
+
+            pin.append(imageCont);
+            pin.append(user);
+            contributorsArea.append(pin);
+        };
+
         var fetchSummary = function (self,content, project) {
             var summaryTitle = content.find("#project-info-summary-title");
             var summaryArea = content.find("#project-info-page-middle-section");
@@ -115,17 +131,8 @@ define(
 
                             for(var i in contributors)
                             {
-                                var pin = $("<div/>", {class:"pin"});
-                                var imageCont = $("<div/>", {class:"col-md-2 col-sm-1 col-xs-1"});
-                                var image = $("<img/>", {src:"/assets/images/empty.jpg"});
-                                imageCont.append(image);
 
-                                var user = $("<div/>", {class:"col-md-10 col-sm-10 col-xs-10 project-info-page-user"});
-                                user.text(contributors[i].username);
-
-                                pin.append(imageCont);
-                                pin.append(user);
-                                contributorsArea.append(pin);
+                                addContributor(contributorsArea, contributors[i].username);
                             }
 
                         })
@@ -165,6 +172,17 @@ define(
                         fetchSummary(this,content, project);
                         fetchStats(this,content, project);
                         fetchContrib(this,content, project);
+                    }
+                    else{
+
+                    }
+
+                });
+
+                Project.onChange(Project.properties.Contributors, this, function (failed, change) {
+                    if(!failed && change.type == "add")
+                    {
+                        addContributor(content.find("#project-info-page-right-section"), change.data.username);
                     }
 
                 });

@@ -15,7 +15,8 @@ define(["store", "stores/User"], function(Store, User){
         //access by this.properties.PROJECTS which represent the id that is needed to observe changes on projects.
         properties: [
             "PROJECTS",
-            "CUR_PROJECT"
+            "CUR_PROJECT",
+            "Contributors"
         ],
 
         ajaxMethods:{
@@ -133,6 +134,12 @@ define(["store", "stores/User"], function(Store, User){
                         {
                             return returnedData.message;
                         }
+                        //fire contributr change
+                        if(contributors)
+                        {
+                            contributors.push(returnedData);
+                            this.fireChange(this.properties.Contributors, false,{type: "add", data:returnedData}, null);
+                        }
                         return null;
                     },
                     filterFailedArguments : function (x, msg) {
@@ -161,6 +168,7 @@ define(["store", "stores/User"], function(Store, User){
 
                             return returnedData.message;
                         }
+                        contributors = returnedData;
                         return returnedData;
                     },
                     filterFailedArguments : function (x, msg) {
@@ -186,6 +194,7 @@ define(["store", "stores/User"], function(Store, User){
 
                             return returnedData.message;
                         }
+                        summary = returnedData;
                         return returnedData;
                     },
                     filterFailedArguments : function (x, msg) {
@@ -210,6 +219,7 @@ define(["store", "stores/User"], function(Store, User){
                         {
                             return returnedData.message;
                         }
+                        stats = returnedData;
                         return returnedData;
                     },
                     filterFailedArguments : function (x, msg) {
@@ -240,8 +250,9 @@ define(["store", "stores/User"], function(Store, User){
                     else
                     {
                         cur_project = projects[args.pid];
-                        this.fireChange(this.properties.CUR_PROJECT, false,cur_project , null);
                         projectChanged();
+                        this.fireChange(this.properties.CUR_PROJECT, false,cur_project , null);
+
                     }
                 }
                 else
@@ -260,8 +271,8 @@ define(["store", "stores/User"], function(Store, User){
                                         return;
                                     }
                                     cur_project = data;
-                                    this.fireChange(this.properties.CUR_PROJECT, false,cur_project , null);
                                     projectChanged();
+                                    this.fireChange(this.properties.CUR_PROJECT, false,cur_project , null);
                                 })
                                 .fail(function (x, msg) {
                                     this.fireChange(this.properties.CUR_PROJECT, true, null, null);
