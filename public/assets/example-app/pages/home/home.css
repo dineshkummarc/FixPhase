@@ -1,0 +1,18 @@
+#home-page-div{
+    padding: 30px;
+
+}
+
+#home-page-div p{
+    color: purple;
+    font-size: 3em;
+}
+
+#home-page-div input[type=text]{
+    font-size: 3em;
+}
+
+#home-page-div button{
+    font-size: 3em;
+}
+
