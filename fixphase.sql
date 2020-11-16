@@ -19,7 +19,7 @@ SET time_zone = "+00:00";
 --
 -- Database: `fixphase`
 --
-CREATE DATABASE fixphase;
+-- CREATE DATABASE fixphase;
 USE fixphase;
 -- --------------------------------------------------------
 
